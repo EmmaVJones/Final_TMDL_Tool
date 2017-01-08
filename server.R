@@ -30,11 +30,11 @@ shinyServer(function(input, output, session) {
   return(data_all)
   })
   output$summaryStats <- renderTable(stats())
-  
+ 
   # Output Colored datatable
   output$colors <- DT::renderDataTable({
-    datatable(stats()) %>% formatStyle("FieldpH", backgroundColor = styleInterval(brkspH, clrspH))%>%
-      formatStyle("DoProbe", backgroundColor = styleInterval(brksDO, clrsDO)) %>%
+    datatable(stats()) %>% formatStyle("pH", backgroundColor = styleInterval(brkspH, clrspH))%>%
+      formatStyle("DO", backgroundColor = styleInterval(brksDO, clrsDO)) %>%
       formatStyle("TN", backgroundColor = styleInterval(brksTN, clrsTN))%>%
       formatStyle("TP", backgroundColor = styleInterval(brksTP, clrsTP))%>%
       formatStyle("TotalHabitat", backgroundColor = styleInterval(brksTotHab, clrsTotHab))%>%
@@ -46,7 +46,19 @@ shinyServer(function(input, output, session) {
       formatStyle("DChloride", backgroundColor = styleInterval(brksDChl, clrsDChl))%>%
       formatStyle("DPotassium", backgroundColor = styleInterval(brksDK, clrsDK))%>%
       formatStyle("Dsodium", backgroundColor = styleInterval(brksDNa, clrsDNa))
-      
+    })
+  
+  # Table with Yearly Stats and percentile lookup
+  percentiles <- reactive({
+  if(is.null(stats()))
+    return(NULL)
+  test <- percentileTable(stats(),"DO",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+  return(test)
   })
+
+     
+  
+  output$DOtable <- DT::renderDataTable({percentiles()})
+  
 })
 

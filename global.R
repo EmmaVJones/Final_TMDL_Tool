@@ -5,6 +5,7 @@ library(ggplot2)
 library(plyr)
 library(dplyr)
 library(DT)
+library(tidyr)
 
 # Local data locations
 VAstationselect <- readRDS('data/VAstationselect2.RDS')
@@ -70,4 +71,21 @@ vlookup <- function(ref, #the value or values that you want to look for
   }
   dim(output) <- dim(ref)
   output
+}
+
+
+# Return percentile 
+percentileTable <- function(statsTable,parameter,userBasin,userEco,userOrder,stationName){
+  out <- statsTable%>%select_("Statistic",parameter)%>% spread_("Statistic",parameter)%>%
+    mutate(Statistic=stationName)%>%select(Statistic,everything())
+  va <- filter(cdfdata,Subpopulation=='Virginia',Indicator==parameter)%>%select(Value,Estimate.P)
+  basin <- filter(cdfdata,Subpopulation==userBasin,Indicator==parameter)%>%select(Value,Estimate.P)
+  eco <- filter(cdfdata,Subpopulation==userEco,Indicator==parameter)%>%select(Value,Estimate.P)
+  order <- filter(cdfdata,Subpopulation==userOrder,Indicator==parameter)%>%select(Value,Estimate.P)
+  va2 <- data.frame(Statistic='Statewide',Average=vlookup(out$Average,va,2,range=TRUE),Median=vlookup(out$Median,va,2,range=TRUE))
+  basin2 <- data.frame(Statistic=userBasin,Average=vlookup(out$Average,basin,2,TRUE),Median=vlookup(out$Median,basin,2,TRUE))
+  eco2 <- data.frame(Statistic=userEco,Average=vlookup(out$Average,eco,2,TRUE),Median=vlookup(out$Median,eco,2,TRUE))
+  order2 <- data.frame(Statistic=userOrder,Average=vlookup(out$Average,order,2,TRUE),Median=vlookup(out$Median,order,2,TRUE))
+  out_final <- rbind(out,va2,basin2,eco2,order2)
+  return(out_final)
 }
