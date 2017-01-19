@@ -238,60 +238,267 @@ shinyServer(function(input, output, session) {
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  output$TotalHabitattable <- DT::renderDataTable({percentilesTotalHabitat()})
+  # Total Habitat Summary Page
+  output$TotalHabitattable_Site <- DT::renderDataTable({datatable(percentilesTotalHabitat()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTotHab, clrsTotHab))})
+  output$TotalHabitattable <- DT::renderDataTable({datatable(percentilesTotalHabitat()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableTotalHabitat <- DT::renderDataTable({
     datatable(cbind(risk,TotalHabitat=c('< 100','> 100, < 130','> 130, < 150','> 150')),colnames=c('Risk Category','Total Habitat (unitless)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$LRBStable <- DT::renderDataTable({percentilesLRBS()})
+  output$TotalHabitatdataset <- renderUI({
+    selectInput("TotalHabitatdataset_","Select Dataset to Plot",percentilesTotalHabitat()$Statistic[2:5])
+  })
+  output$TotalHabitatplot_ <- renderUI({
+    plotOutput("p_TotalHabitat")
+  })
+  output$p_TotalHabitat <- renderPlot({
+    if(is.null(input$TotalHabitatdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"TotalHabitat",input$TotalHabitatdataset_)
+    avg1 <- as.numeric(subset(percentilesTotalHabitat(),Statistic==input$TotalHabitatdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesTotalHabitat(),Statistic==input$TotalHabitatdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Habitat (unitless)",y="Percentile") +
+      ggtitle(paste(input$TotalHabitatdataset_," Total Habitat Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # LRBS Summary Page
+  output$LRBStable_Site <- DT::renderDataTable({datatable(percentilesLRBS()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksLRBS, clrsLRBS))})
+  output$LRBStable <- DT::renderDataTable({datatable(percentilesLRBS()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableLRBS <- DT::renderDataTable({
     datatable(cbind(rbind(risk,'Medium Risk to Aquatic Life'),LRBS=c('< -1.5','> -1.5, < -1.0','> -0.5, < -1.0','> -0.5, < 0.5','> 0.5')),colnames=c('Risk Category','Relative Bed Stability (unitless)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c(riskHightoLow,'Medium Risk to Aquatic Life'),clrsLRBS[2:6]))})
-  output$MetalsCCUtable <- DT::renderDataTable({percentilesMetalsCCU()})
+  output$LRBSdataset <- renderUI({
+    selectInput("LRBSdataset_","Select Dataset to Plot",percentilesLRBS()$Statistic[2:5])
+  })
+  output$LRBSplot_ <- renderUI({
+    plotOutput("p_LRBS")
+  })
+  output$p_LRBS <- renderPlot({
+    if(is.null(input$LRBSdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"LRBS",input$LRBSdataset_)
+    avg1 <- as.numeric(subset(percentilesLRBS(),Statistic==input$LRBSdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesLRBS(),Statistic==input$LRBSdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="LRBS (unitless)",y="Percentile") +
+      ggtitle(paste(input$LRBSdataset_," LRBS Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # Metals CCU Summary Page
+  output$MetalsCCUtable_Site <- DT::renderDataTable({datatable(percentilesMetalsCCU()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksMCCU, clrsMCCU))})
+  output$MetalsCCUtable <- DT::renderDataTable({datatable(percentilesMetalsCCU()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableMetalsCCU <- DT::renderDataTable({
     datatable(cbind(risk,MetalsCCU=c('> 2.0','> 1.5, < 2.0','> 0.75, < 1.5','< 0.75')),colnames=c('Risk Category','Metals CCU (unitless)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$SpCondtable <- DT::renderDataTable({percentilesSpCond()})
+  output$MetalsCCUdataset <- renderUI({
+    selectInput("MetalsCCUdataset_","Select Dataset to Plot",percentilesMetalsCCU()$Statistic[2:5])
+  })
+  output$MetalsCCUplot_ <- renderUI({
+    plotOutput("p_MetalsCCU")
+  })
+  output$p_MetalsCCU <- renderPlot({
+    if(is.null(input$MetalsCCUdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"MetalsCCU",input$MetalsCCUdataset_)
+    avg1 <- as.numeric(subset(percentilesMetalsCCU(),Statistic==input$MetalsCCUdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesMetalsCCU(),Statistic==input$MetalsCCUdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Metals CCU (unitless)",y="Percentile") +
+      ggtitle(paste(input$MetalsCCUdataset_," Metals CCU Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # Specific Conductivity Summary Page
+  output$SpCondtable_Site <- DT::renderDataTable({datatable(percentilesSpCond()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksSpCond, clrsSpCond))})
+  output$SpCondtable <- DT::renderDataTable({datatable(percentilesSpCond()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableSpCond <- DT::renderDataTable({
     datatable(cbind(risk,SpCond=c('> 500','> 350, < 500','> 250, < 350','< 250')),colnames=c('Risk Category','Specific Conductivity (uS/cm)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$TDStable <- DT::renderDataTable({percentilesTDS()})
+  output$SpConddataset <- renderUI({
+    selectInput("SpConddataset_","Select Dataset to Plot",percentilesSpCond()$Statistic[2:5])
+  })
+  output$SpCondplot_ <- renderUI({
+    plotOutput("p_SpCond")
+  })
+  output$p_SpCond <- renderPlot({
+    if(is.null(input$SpConddataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"SpCond",input$SpConddataset_)
+    avg1 <- as.numeric(subset(percentilesSpCond(),Statistic==input$SpConddataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesSpCond(),Statistic==input$SpConddataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Specific Conductivity (uS/cm)",y="Percentile") +
+      ggtitle(paste(input$SpConddataset_," Specific Conductivity Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+   
+  # TDS Summary Page
+  output$TDStable_Site <- DT::renderDataTable({datatable(percentilesTDS()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTDS, clrsTDS))})
+  output$TDStable <- DT::renderDataTable({datatable(percentilesTDS()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableTDS <- DT::renderDataTable({
     datatable(cbind(risk,TDS=c('> 350','> 250, < 350','> 100, < 250','< 100')),colnames=c('Risk Category','Total Dissolved Solids (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$DSulfatetable <- DT::renderDataTable({percentilesDSulfate()})
+  output$TDSdataset <- renderUI({
+    selectInput("TDSdataset_","Select Dataset to Plot",percentilesTDS()$Statistic[2:5])
+  })
+  output$TDSplot_ <- renderUI({
+    plotOutput("p_TDS")
+  })
+  output$p_TDS <- renderPlot({
+    if(is.null(input$TDSdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"TDS",input$TDSdataset_)
+    avg1 <- as.numeric(subset(percentilesTDS(),Statistic==input$TDSdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesTDS(),Statistic==input$TDSdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Dissolved Solids (mg/L)",y="Percentile") +
+      ggtitle(paste(input$TDSdataset_," Total Dissolved Solids Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # Dissolved Sulfate Summary Page
+  output$DSulfatetable_Site <- DT::renderDataTable({datatable(percentilesDSulfate()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksDChl, clrsDChl))})
+  output$DSulfatetable <- DT::renderDataTable({datatable(percentilesDSulfate()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableDSulfate <- DT::renderDataTable({
     datatable(cbind(risk,DSulfate=c('> 75','> 25, < 75','> 10, < 25','< 10')),colnames=c('Risk Category','Dissolved Sulfate (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$DChloridetable <- DT::renderDataTable({percentilesDChloride()})
+  output$DSulfatedataset <- renderUI({
+    selectInput("DSulfatedataset_","Select Dataset to Plot",percentilesDSulfate()$Statistic[2:5])
+  })
+  output$DSulfateplot_ <- renderUI({
+    plotOutput("p_DSulfate")
+  })
+  output$p_DSulfate <- renderPlot({
+    if(is.null(input$DSulfatedataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"DSulfate",input$DSulfatedataset_)
+    avg1 <- as.numeric(subset(percentilesDSulfate(),Statistic==input$DSulfatedataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesDSulfate(),Statistic==input$DSulfatedataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sulfate (mg/L)",y="Percentile") +
+      ggtitle(paste(input$DSulfatedataset_," Dissolved Sulfate Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # Dissolved Chloride Summary Page
+  output$DChloridetable_Site <- DT::renderDataTable({datatable(percentilesDChloride()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksDS, clrsDS))})
+  output$DChloridetable <- DT::renderDataTable({datatable(percentilesDChloride()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableDChloride <- DT::renderDataTable({
-    datatable(cbind(risk,DSulfate=c('> 50','> 25, < 50','> 10, < 25','< 10')),colnames=c('Risk Category','Dissolved Chloride (mg/L)'),rownames = F)%>%
+    datatable(cbind(risk,DChloride=c('> 50','> 25, < 50','> 10, < 25','< 10')),colnames=c('Risk Category','Dissolved Chloride (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$DPotassiumtable <- DT::renderDataTable({percentilesDPotassium()})
+  output$DChloridedataset <- renderUI({
+    selectInput("DChloridedataset_","Select Dataset to Plot",percentilesDChloride()$Statistic[2:5])
+  })
+  output$DChlorideplot_ <- renderUI({
+    plotOutput("p_DChloride")
+  })
+  output$p_DChloride <- renderPlot({
+    if(is.null(input$DChloridedataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"DChloride",input$DChloridedataset_)
+    avg1 <- as.numeric(subset(percentilesDChloride(),Statistic==input$DChloridedataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesDChloride(),Statistic==input$DChloridedataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Chloride (mg/L)",y="Percentile") +
+      ggtitle(paste(input$DChloridedataset_," Dissolved Chloride Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # Dissolved Potassium Summary Page
+  output$DPotassiumtable_Site <- DT::renderDataTable({datatable(percentilesDPotassium()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksDK, clrsDK))})
+  output$DPotassiumtable <- DT::renderDataTable({datatable(percentilesDPotassium()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableDPotassium <- DT::renderDataTable({
     datatable(cbind(risk,DPotassium=c('> 10','> 2, < 10','> 1, < 2','< 1')),colnames=c('Risk Category','Dissolved Potassium (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$DSodiumtable <- DT::renderDataTable({percentilesDSodium()})
+  output$DPotassiumdataset <- renderUI({
+    selectInput("DPotassiumdataset_","Select Dataset to Plot",percentilesDPotassium()$Statistic[2:5])
+  })
+  output$DPotassiumplot_ <- renderUI({
+    plotOutput("p_DPotassium")
+  })
+  output$p_DPotassium <- renderPlot({
+    if(is.null(input$DPotassiumdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"DPotassium",input$DPotassiumdataset_)
+    avg1 <- as.numeric(subset(percentilesDPotassium(),Statistic==input$DPotassiumdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesDPotassium(),Statistic==input$DPotassiumdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Potassium (mg/L)",y="Percentile") +
+      ggtitle(paste(input$DPotassiumdataset_," Dissolved Potassium Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # Dissolved Sodium Summary Page
+  output$DSodiumtable_Site <- DT::renderDataTable({datatable(percentilesDSodium()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksDNa, clrsDNa))})
+  output$DSodiumtable <- DT::renderDataTable({datatable(percentilesDSodium()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableDSodium <- DT::renderDataTable({
     datatable(cbind(risk,DSodium=c('> 20','> 10, < 20','> 7, < 10','< 7')),colnames=c('Risk Category','Dissolved Sodium (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$DSodiumdataset <- renderUI({
+    selectInput("DSodiumdataset_","Select Dataset to Plot",percentilesDSodium()$Statistic[2:5])
+  })
+  output$DSodiumplot_ <- renderUI({
+    plotOutput("p_DSodium")
+  })
+  output$p_DSodium <- renderPlot({
+    if(is.null(input$DSodiumdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"DSodium",input$DSodiumdataset_)
+    avg1 <- as.numeric(subset(percentilesDSodium(),Statistic==input$DSodiumdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesDSodium(),Statistic==input$DSodiumdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sodium (mg/L)",y="Percentile") +
+      ggtitle(paste(input$DSodiumdataset_," Dissolved Sodium Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
 })
 
 #output$test <- reactive({

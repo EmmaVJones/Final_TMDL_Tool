@@ -78,17 +78,64 @@ shinyUI(fluidPage(theme="slate.css",
                                                             DT::dataTableOutput('TPtable'),br(),
                                                             column(6,DT::dataTableOutput('riskTableTP')),
                                                             column(6,uiOutput("TPdataset"), uiOutput("TPplot_"),plotOutput('TPplot'))),
+                                                   # Total Habitat Summary
+                                                   tabPanel("Total Habitat Summary",br(),br(),h4('Total Habitat Summary'),
+                                                            DT::dataTableOutput('TotalHabitattable_Site'),
+                                                            DT::dataTableOutput('TotalHabitattable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableTotalHabitat')),
+                                                            column(6,uiOutput("TotalHabitatdataset"), uiOutput("TotalHabitatplot_"),plotOutput('TotalHabitatplot'))),
+                                                   # LRBS Summary
+                                                   tabPanel("LRBS Summary",br(),br(),h4('LRBS Summary'),
+                                                            DT::dataTableOutput('LRBStable_Site'),
+                                                            DT::dataTableOutput('LRBStable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableLRBS')),
+                                                            column(6,uiOutput("LRBSdataset"), uiOutput("LRBSplot_"),plotOutput('LRBSplot'))),
+                                                   # Metals CCU Summary
+                                                   tabPanel("Metals CCU Summary",br(),br(),h4('Metals CCU Summary'),
+                                                            DT::dataTableOutput('MetalsCCUtable_Site'),
+                                                            DT::dataTableOutput('MetalsCCUtable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableMetalsCCU')),
+                                                            column(6,uiOutput("MetalsCCUdataset"), uiOutput("MetalsCCUplot_"),plotOutput('MetalsCCUplot'))),
+                                                   # Specific Conductivity Summary
+                                                   tabPanel("Specific Conductivity Summary",br(),br(),h4('Specific Conductivity Summary'),
+                                                            DT::dataTableOutput('SpCondtable_Site'),
+                                                            DT::dataTableOutput('SpCondtable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableSpCond')),
+                                                            column(6,uiOutput("SpConddataset"), uiOutput("SpCondplot_"),plotOutput('SpCondplot'))),
+                                                   # TDS Summary
+                                                   tabPanel("TDS Summary",br(),br(),h4('Total Dissolved Solids Summary'),
+                                                            DT::dataTableOutput('TDStable_Site'),
+                                                            DT::dataTableOutput('TDStable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableTDS')),
+                                                            column(6,uiOutput("TDSdataset"), uiOutput("TDSplot_"),plotOutput('TDSplot'))),
+                                                   # Dissolved Sulfate Summary
+                                                   tabPanel("Dissolved Sulfate Summary",br(),br(),h4('Dissolved Sulfate Summary'),
+                                                            DT::dataTableOutput('DSulfatetable_Site'),
+                                                            DT::dataTableOutput('DSulfatetable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableDSulfate')),
+                                                            column(6,uiOutput("DSulfatedataset"), uiOutput("DSulfateplot_"),plotOutput('DSulfateplot'))),
+                                                   # Dissolved Chloride Summary
+                                                   tabPanel("Dissolved Chloride Summary",br(),br(),h4('Dissolved Chloride Summary'),
+                                                            DT::dataTableOutput('DChloridetable_Site'),
+                                                            DT::dataTableOutput('DChloridetable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableDChloride')),
+                                                            column(6,uiOutput("DChloridedataset"), uiOutput("DChlorideplot_"),plotOutput('DChlorideplot'))),
+                                                   # Dissolved Potassium Summary
+                                                   tabPanel("Dissolved Potassium Summary",br(),br(),h4('Dissolved Potassium Summary'),
+                                                            DT::dataTableOutput('DPotassiumtable_Site'),
+                                                            DT::dataTableOutput('DPotassiumtable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableDPotassium')),
+                                                            column(6,uiOutput("DPotassiumdataset"), uiOutput("DPotassiumplot_"),plotOutput('DPotassiumplot'))),
                                                    
-                                                   tabPanel("Total Habitat Summary",br(),br(),h4('Total Habitat Summary'),DT::dataTableOutput('TotalHabitattable'),column(6,DT::dataTableOutput('riskTableTotalHabitat'))),
-                                                   tabPanel("LRBS Summary",br(),br(),h4('LRBS Summary'),DT::dataTableOutput('LRBStable'),column(6,DT::dataTableOutput('riskTableLRBS'))),
-                                                   tabPanel("Metals CCU Summary",br(),br(),h4('Metals CCU Summary'),DT::dataTableOutput('MetalsCCUtable'),column(6,DT::dataTableOutput('riskTableMetalsCCU'))),
-                                                   tabPanel("Sp Conductivity Summary",br(),br(),h4('SP Conductivity Summary'),DT::dataTableOutput('SpCondtable'),column(6,DT::dataTableOutput('riskTableSpCond'))),
-                                                   tabPanel("TDS Summary",br(),br(),h4('TDS Summary'),DT::dataTableOutput('TDStable'),column(6,DT::dataTableOutput('riskTableTDS'))),
-                                                   tabPanel("Dissolved Sulfate Summary",br(),br(),h4('Dissolved Sulfate Summary'),DT::dataTableOutput('DSulfatetable'),column(6,DT::dataTableOutput('riskTableDSulfate'))),
-                                                   tabPanel("Dissolved Chloride Summary",br(),br(),h4('Dissolved Chloride Summary'),DT::dataTableOutput('DChloridetable'),column(6,DT::dataTableOutput('riskTableDChloride'))),
-                                                   tabPanel("Dissolved Potassium Summary",br(),br(),h4('Dissolved Potassium Summary'),DT::dataTableOutput('DPotassiumtable'),column(6,DT::dataTableOutput('riskTableDPotassium'))),
-                                                   tabPanel("Dissolved Sodium Summary",br(),br(),h4('Dissolved Sodium Summary'),DT::dataTableOutput('DSodiumtable'),column(6,DT::dataTableOutput('riskTableDSodium'))))
-                                        
+                                                   # Dissolved Sodium Summary
+                                                   tabPanel("Dissolved Sodium Summary",br(),br(),h4('Dissolved Sodium Summary'),
+                                                            DT::dataTableOutput('DSodiumtable_Site'),
+                                                            DT::dataTableOutput('DSodiumtable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableDSodium')),
+                                                            column(6,uiOutput("DSodiumdataset"), uiOutput("DSodiumplot_"),plotOutput('DSodiumplot'))))
+                                                   
+                                                   
+                                                   
                                       )))
                   ))
 )
