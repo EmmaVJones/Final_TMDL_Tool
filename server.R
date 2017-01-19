@@ -58,8 +58,7 @@ shinyServer(function(input, output, session) {
   percentilespH <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"pH",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"pH",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesDO <- reactive({
   if(is.null(stats()))
@@ -69,79 +68,93 @@ shinyServer(function(input, output, session) {
   percentilesTN <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"TN",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"TN",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesTP <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"TP",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"TP",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesTotalHabitat <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"TotalHabitat",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"TotalHabitat",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesLRBS <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"LRBS",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"LRBS",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesMetalsCCU <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"MetalsCCU",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"MetalsCCU",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesSpCond <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"SpCond",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"SpCond",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesTDS <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"TDS",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"TDS",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesDSulfate <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"DSulfate",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"DSulfate",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesDChloride <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"DChloride",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"DChloride",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesDPotassium <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"DPotassium",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"DPotassium",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesDSodium <- reactive({
     if(is.null(stats()))
       return(NULL)
-    test <- percentileTable(stats(),"DSodium",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-    return(test)
+    return(percentileTable(stats(),"DSodium",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
 
-     
-  output$pHtable <- DT::renderDataTable({percentilespH()})
+  # pH Summary Page   
+  output$pHtable_Site <- DT::renderDataTable({datatable(percentilespH()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brkspH, clrspH))})
+  output$pHtable <- DT::renderDataTable({datatable(percentilespH()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTablepH <- DT::renderDataTable({
-      datatable(data.frame(Risk_Category=c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
+    datatable(data.frame(Risk_Category=c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
               colnames=c('Risk Category','pH (unitless)'),rownames = F) %>%#,options=list(columnDefs=list(list(targets=3,visible=F)))
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life'),c('yellow','limegreen')))})
+  output$pHdataset <- renderUI({
+    selectInput("pHdataset_","Select Dataset to Plot",percentilespH()$Statistic[2:5])
+  })
+  output$pHplot_ <- renderUI({
+    plotOutput("p_pH")
+  })
+  output$p_pH <- renderPlot({
+    if(is.null(input$pHdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"pH",input$pHdataset_)
+    avg1 <- as.numeric(subset(percentilespH(),Statistic==input$pHdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilespH(),Statistic==input$pHdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="pH (unitless)",y="Percentile") +
+      ggtitle(paste(input$pHdataset_," pH Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
 
-  # Dissolved Oxygen Report Page  
-  output$DOtable <- DT::renderDataTable({percentilesDO()})
+  # Dissolved Oxygen Summary Page
+  output$DOtable_Site <- DT::renderDataTable({datatable(percentilesDO()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksDO, clrsDO))})
+  output$DOtable <- DT::renderDataTable({datatable(percentilesDO()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableDO <- DT::renderDataTable({
     datatable(cbind(risk,DO=c('< 7','> 7, < 8','> 8, < 10','> 10')),colnames=c('Risk Category','DO (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
@@ -167,21 +180,82 @@ shinyServer(function(input, output, session) {
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
   
-  
-  
-  
-  
-  
-  
-  
-  output$TNtable <- DT::renderDataTable({percentilesTN()})
+  # Total Nitrogen Summary Page
+  output$TNtable_Site <- DT::renderDataTable({datatable(percentilesTN()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTN, clrsTN))})
+  output$TNtable <- DT::renderDataTable({datatable(percentilesTN()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableTN <- DT::renderDataTable({
     datatable(cbind(risk,TN=c('> 2','> 1, < 2','> 0.5, < 1','< 0.5')),colnames=c('Risk Category','Total Nitrogen (mg/L)'),rownames = F)%>%
-      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$TPtable <- DT::renderDataTable({percentilesTP()})
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsTN[5:2]))})# reverse colors
+  output$TNdataset <- renderUI({
+    selectInput("TNdataset_","Select Dataset to Plot",percentilesTN()$Statistic[2:5])
+  })
+  output$TNplot_ <- renderUI({
+    plotOutput("p_TN")
+  })
+  output$p_TN <- renderPlot({
+    if(is.null(input$TNdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"TN",input$TNdataset_)
+    avg1 <- as.numeric(subset(percentilesTN(),Statistic==input$TNdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesTN(),Statistic==input$TNdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Nitrogen (mg/L)",y="Percentile") +
+      ggtitle(paste(input$TNdataset_," Total Nitrogen Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  # Total Phosphorus Summary Page
+  output$TPtable_Site <- DT::renderDataTable({datatable(percentilesTP()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTP, clrsTP))})
+  output$TPtable <- DT::renderDataTable({datatable(percentilesTP()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableTP <- DT::renderDataTable({
     datatable(cbind(risk,TP=c('> 0.1','> 0.05, < 0.1','> 0.02, < 0.05','< 0.02')),colnames=c('Risk Category','Total Phosphorus (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$TPdataset <- renderUI({
+    selectInput("TPdataset_","Select Dataset to Plot",percentilesTP()$Statistic[2:5])
+  })
+  output$TPplot_ <- renderUI({
+    plotOutput("p_TP")
+  })
+  output$p_TP <- renderPlot({
+    if(is.null(input$TPdataset_))
+      return(NULL)
+    cdfsubset <- subFunction(cdfdata,"TP",input$TPdataset_)
+    avg1 <- as.numeric(subset(percentilesTP(),Statistic==input$TPdataset_)[2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(subset(percentilesTP(),Statistic==input$TPdataset_)[3])
+    med <- subFunction2(cdfsubset,med1)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Phosphorus (mg/L)",y="Percentile") +
+      ggtitle(paste(input$TPdataset_," Total Phosphorus Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+  })
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   output$TotalHabitattable <- DT::renderDataTable({percentilesTotalHabitat()})
   output$riskTableTotalHabitat <- DT::renderDataTable({
     datatable(cbind(risk,TotalHabitat=c('< 100','> 100, < 130','> 130, < 150','> 150')),colnames=c('Risk Category','Total Habitat (unitless)'),rownames = F)%>%

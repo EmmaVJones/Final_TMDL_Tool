@@ -53,27 +53,32 @@ shinyUI(fluidPage(theme="slate.css",
                                       column(12,tabsetPanel(
                                         tabPanel("Composite Table",br(),br(),h4('Composite Table'),DT::dataTableOutput('colors'),
                                                  column(6,DT::dataTableOutput('riskTableInfo'))),
-                                        tabPanel("pH Summary",br(),br(),h4('pH Summary'),DT::dataTableOutput('pHtable'),column(6,DT::dataTableOutput('riskTablepH'))),
-                                        
-                                        
-                                        
+                                        # pH Summary
+                                        tabPanel("pH Summary",br(),br(),h4('pH Summary'),
+                                                 DT::dataTableOutput('pHtable_Site'),
+                                                 DT::dataTableOutput('pHtable'),br(),
+                                                 column(6,DT::dataTableOutput('riskTablepH')),
+                                                 column(6,uiOutput("pHdataset"), uiOutput("pHplot_"),plotOutput('pHplot'))),
+                                        # DO Summary
                                         tabPanel("DO Summary",br(),br(),h4('DO Summary'),
-                                                 DT::dataTableOutput('DOtable'),verbatimTextOutput('test'),
+                                                 DT::dataTableOutput('DOtable_Site'),
+                                                 DT::dataTableOutput('DOtable'),br(),
                                                  column(6,DT::dataTableOutput('riskTableDO')),
-                                                 column(6,uiOutput("DOdataset"),
-                                                        #selectInput("DOdataset","Dataset:", 
-                                                        #              list("Virginia" = "Statewide", "Basin" = "Basin","Ecogregion"="Ecoregion","Order"="Order")),
-                                                        uiOutput("DOplot_"),
-                                                        plotOutput('DOplot'))),
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        tabPanel("TN Summary",br(),br(),h4('TN Summary'),DT::dataTableOutput('TNtable'),column(6,DT::dataTableOutput('riskTableTN'))),
+                                                 column(6,uiOutput("DOdataset"), uiOutput("DOplot_"),plotOutput('DOplot'))),
+                                        # TN Summary
+                                        tabPanel("TN Summary",br(),br(),h4('TN Summary'),
+                                                 DT::dataTableOutput('TNtable_Site'),
+                                                 DT::dataTableOutput('TNtable'),br(),
+                                                 column(6,DT::dataTableOutput('riskTableTN')),
+                                                 column(6,uiOutput("TNdataset"), uiOutput("TNplot_"),plotOutput('TNplot'))),
                                         navbarMenu("More",
-                                                   tabPanel("TP Summary",br(),br(),h4('TP Summary'),DT::dataTableOutput('TPtable'),column(6,DT::dataTableOutput('riskTableTP'))),
+                                                   # TP Summary
+                                                   tabPanel("TP Summary",br(),br(),h4('TP Summary'),
+                                                            DT::dataTableOutput('TPtable_Site'),
+                                                            DT::dataTableOutput('TPtable'),br(),
+                                                            column(6,DT::dataTableOutput('riskTableTP')),
+                                                            column(6,uiOutput("TPdataset"), uiOutput("TPplot_"),plotOutput('TPplot'))),
+                                                   
                                                    tabPanel("Total Habitat Summary",br(),br(),h4('Total Habitat Summary'),DT::dataTableOutput('TotalHabitattable'),column(6,DT::dataTableOutput('riskTableTotalHabitat'))),
                                                    tabPanel("LRBS Summary",br(),br(),h4('LRBS Summary'),DT::dataTableOutput('LRBStable'),column(6,DT::dataTableOutput('riskTableLRBS'))),
                                                    tabPanel("Metals CCU Summary",br(),br(),h4('Metals CCU Summary'),DT::dataTableOutput('MetalsCCUtable'),column(6,DT::dataTableOutput('riskTableMetalsCCU'))),
