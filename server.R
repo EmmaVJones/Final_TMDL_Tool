@@ -139,49 +139,35 @@ shinyServer(function(input, output, session) {
       datatable(data.frame(Risk_Category=c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
               colnames=c('Risk Category','pH (unitless)'),rownames = F) %>%#,options=list(columnDefs=list(list(targets=3,visible=F)))
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life'),c('yellow','limegreen')))})
+
+  # Dissolved Oxygen Report Page  
   output$DOtable <- DT::renderDataTable({percentilesDO()})
-  
-  
-  
   output$riskTableDO <- DT::renderDataTable({
     datatable(cbind(risk,DO=c('< 7','> 7, < 8','> 8, < 10','> 10')),colnames=c('Risk Category','DO (mg/L)'),rownames = F)%>%
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
-  output$test <- reactive({
-    if(is.null(percentilesDO()))
-      return(NULL)
-    #input$DOdataset_})
-    #percentilesDO()$Statistic})
-    #as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[3])})
-    #x1 <- subset(percentilesDO(),Statistic==input$DOdataset_)
-    #return(x1)})#%>%select(Average)})
-  
   output$DOdataset <- renderUI({
     selectInput("DOdataset_","Select Dataset to Plot",percentilesDO()$Statistic[2:5])
   })
-  
   output$DOplot_ <- renderUI({
-    plotOutput("p")
+    plotOutput("p_DO")
   })
-  
-  output$p <- renderPlot({
+  output$p_DO <- renderPlot({
+    if(is.null(input$DOdataset_))
+      return(NULL)
     cdfsubset <- subFunction(cdfdata,"DO",input$DOdataset_)
     avg1 <- as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[2])
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile")
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile") +
+      ggtitle(paste(input$DOdataset_," Dissolved Oxygen Percentile Graph",sep="")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
   
-  output$DOplot <- renderPlot({
-    cdfsubset <- subFunction(cdfdata,"DO","Virginia")
-    avg <- subFunction2(cdfsubset,percentilesDO()$Average[2])
-    med <- subFunction2(cdfsubset,percentilesDO()$Median[2])
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile")
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+  
   
   
   
@@ -234,3 +220,21 @@ shinyServer(function(input, output, session) {
       formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
 })
 
+#output$test <- reactive({
+#  if(is.null(percentilesDO()))
+#    return(NULL)
+#  input$DOdataset_})
+#percentilesDO()$Statistic})
+#as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[3])})
+#x1 <- subset(percentilesDO(),Statistic==input$DOdataset_)
+#return(x1)})#%>%select(Average)})
+
+
+#output$DOplot <- renderPlot({
+#  cdfsubset <- subFunction(cdfdata,"DO","Virginia")
+#  avg <- subFunction2(cdfsubset,percentilesDO()$Average[2])
+#  med <- subFunction2(cdfsubset,percentilesDO()$Median[2])
+#  p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile")
+#  p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+#    geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+#})

@@ -102,19 +102,19 @@ subFunction2 <- function(cdftable,userValue){
   return(filter(cdftable,Estimate.P==userValue))
 }
 
-cdfsubset <- subFunction(cdfdata,"DO","Virginia")
-cdfsubset2 <- subFunction(cdfdata,"DO","Northern Piedmont")
-plot(cdfsubset$Value,cdfsubset$Estimate.P)
-plot(cdfsubset2$Value,cdfsubset2$Estimate.P)
+#cdfsubset <- subFunction(cdfdata,"DO","Virginia")
+#cdfsubset2 <- subFunction(cdfdata,"DO","Northern Piedmont")
+#plot(cdfsubset$Value,cdfsubset$Estimate.P)
+#plot(cdfsubset2$Value,cdfsubset2$Estimate.P)
 
-test <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
-test2 <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
+#test <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
+#test2 <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
 
 
-avg <- subFunction2(cdfsubset,82.51)
-med <- subFunction2(cdfsubset,69.48)
+#avg <- subFunction2(cdfsubset,82.51)
+#med <- subFunction2(cdfsubset,69.48)
 #avg <- filter(stats,Statistic=="Average") %>% select(DO) %>% rename(Value=DO) 
 
-p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point()
-p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-  geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+#p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point()
+#p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+#  geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
