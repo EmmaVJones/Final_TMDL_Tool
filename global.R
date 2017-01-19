@@ -10,7 +10,7 @@ library(tidyr)
 # Local data locations
 VAstationselect <- readRDS('data/VAstationselect2.RDS')
 dat4 <- readRDS('data/dat4_2.RDS')
-cdfdata <- readRDS('data/AllcdfData.RDS')
+cdfdata <- readRDS('data/cdfdataFINAL.RDS')
 template <- read.csv('data/template.csv')
 
 # Color breaks and table formatting
@@ -41,7 +41,11 @@ clrsDK <- c("gray","blue","limegreen","yellow","red")
 brksDNa <- c(0,7,10,20)
 clrsDNa <- c("gray","blue","limegreen","yellow","red")
 
-
+# Risk table
+riskHightoLow <- c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')
+risk <- data.frame(Risk_Category=c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life'))
+brksrisk <- c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')
+clrsrisk <- c("red","yellow","limegreen","blue")
 
 # VLOOKUP (Excel function hack) by Julin Maloof
 vlookup <- function(ref, #the value or values that you want to look for
@@ -89,3 +93,28 @@ percentileTable <- function(statsTable,parameter,userBasin,userEco,userOrder,sta
   out_final <- rbind(out,va2,basin2,eco2,order2)
   return(out_final)
 }
+
+subFunction <- function(cdftable,parameter,userInput){
+  return(filter(cdftable,Subpopulation==userInput & Indicator==parameter))
+}
+
+subFunction2 <- function(cdftable,userValue){
+  return(filter(cdftable,Estimate.P==userValue))
+}
+
+cdfsubset <- subFunction(cdfdata,"DO","Virginia")
+cdfsubset2 <- subFunction(cdfdata,"DO","Northern Piedmont")
+plot(cdfsubset$Value,cdfsubset$Estimate.P)
+plot(cdfsubset2$Value,cdfsubset2$Estimate.P)
+
+test <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
+test2 <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
+
+
+avg <- subFunction2(cdfsubset,82.51)
+med <- subFunction2(cdfsubset,69.48)
+#avg <- filter(stats,Statistic=="Average") %>% select(DO) %>% rename(Value=DO) 
+
+p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point()
+p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+  geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 

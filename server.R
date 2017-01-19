@@ -2,7 +2,7 @@
 #eco2 <- readOGR('C:/HardDriveBackup/R/ShinyApp_TMDLworkgroup','vaECOREGIONlevel3__proj84')
 #supaB2 <- readOGR('C:/HardDriveBackup/R/ShinyApp_TMDLworkgroup','VAsuperbasins_proj84')
 
-
+options(DT.options = list(dom = 't'))
 
 shinyServer(function(input, output, session) {
   ## Data Upload Tab, bring in chemistry/field data
@@ -45,20 +45,162 @@ shinyServer(function(input, output, session) {
       formatStyle("DSulfate", backgroundColor = styleInterval(brksDS, clrsDS))%>%
       formatStyle("DChloride", backgroundColor = styleInterval(brksDChl, clrsDChl))%>%
       formatStyle("DPotassium", backgroundColor = styleInterval(brksDK, clrsDK))%>%
-      formatStyle("Dsodium", backgroundColor = styleInterval(brksDNa, clrsDNa))
+      formatStyle("DSodium", backgroundColor = styleInterval(brksDNa, clrsDNa))
     })
   
+  # Output Colored Risk datatable
+  output$riskTableInfo <- DT::renderDataTable({
+    datatable(risk,colnames=c('Risk Category'),rownames=FALSE) %>% 
+      formatStyle('Risk_Category',backgroundColor=styleEqual(brksrisk,clrsrisk))
+  })
+  
   # Table with Yearly Stats and percentile lookup
-  percentiles <- reactive({
+  percentilespH <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"pH",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesDO <- reactive({
   if(is.null(stats()))
     return(NULL)
-  test <- percentileTable(stats(),"DO",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
-  return(test)
+  return(percentileTable(stats(),"DO",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
+    })
+  percentilesTN <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"TN",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesTP <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"TP",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesTotalHabitat <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"TotalHabitat",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesLRBS <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"LRBS",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesMetalsCCU <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"MetalsCCU",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesSpCond <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"SpCond",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesTDS <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"TDS",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesDSulfate <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"DSulfate",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesDChloride <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"DChloride",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesDPotassium <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"DPotassium",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
+  })
+  percentilesDSodium <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    test <- percentileTable(stats(),"DSodium",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID))
+    return(test)
   })
 
      
+  output$pHtable <- DT::renderDataTable({percentilespH()})
+  output$riskTablepH <- DT::renderDataTable({
+      datatable(data.frame(Risk_Category=c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
+              colnames=c('Risk Category','pH (unitless)'),rownames = F) %>%#,options=list(columnDefs=list(list(targets=3,visible=F)))
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life'),c('yellow','limegreen')))})
+  output$DOtable <- DT::renderDataTable({percentilesDO()})
+  output$riskTableDO <- DT::renderDataTable({
+    datatable(cbind(risk,DO=c('< 7','> 7, < 8','> 8, < 10','> 10')),colnames=c('Risk Category','DO (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$test <- reactive({
+    if(is.null(percentilesDO()))
+      return(NULL)
+    percentilesDO()$Average[2]})
+  output$DOplot <- renderPlot({
+    cdfsubset <- subFunction(cdfdata,"DO","Virginia")
+    avg <- subFunction2(cdfsubset,percentilesDO()$Average[2])
+    med <- subFunction2(cdfsubset,percentilesDO()$Median[2])
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile")
+    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    
+    
+  })
   
-  output$DOtable <- DT::renderDataTable({percentiles()})
-  
+  output$TNtable <- DT::renderDataTable({percentilesTN()})
+  output$riskTableTN <- DT::renderDataTable({
+    datatable(cbind(risk,TN=c('> 2','> 1, < 2','> 0.5, < 1','< 0.5')),colnames=c('Risk Category','Total Nitrogen (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$TPtable <- DT::renderDataTable({percentilesTP()})
+  output$riskTableTP <- DT::renderDataTable({
+    datatable(cbind(risk,TP=c('> 0.1','> 0.05, < 0.1','> 0.02, < 0.05','< 0.02')),colnames=c('Risk Category','Total Phosphorus (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$TotalHabitattable <- DT::renderDataTable({percentilesTotalHabitat()})
+  output$riskTableTotalHabitat <- DT::renderDataTable({
+    datatable(cbind(risk,TotalHabitat=c('< 100','> 100, < 130','> 130, < 150','> 150')),colnames=c('Risk Category','Total Habitat (unitless)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$LRBStable <- DT::renderDataTable({percentilesLRBS()})
+  output$riskTableLRBS <- DT::renderDataTable({
+    datatable(cbind(rbind(risk,'Medium Risk to Aquatic Life'),LRBS=c('< -1.5','> -1.5, < -1.0','> -0.5, < -1.0','> -0.5, < 0.5','> 0.5')),colnames=c('Risk Category','Relative Bed Stability (unitless)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c(riskHightoLow,'Medium Risk to Aquatic Life'),clrsLRBS[2:6]))})
+  output$MetalsCCUtable <- DT::renderDataTable({percentilesMetalsCCU()})
+  output$riskTableMetalsCCU <- DT::renderDataTable({
+    datatable(cbind(risk,MetalsCCU=c('> 2.0','> 1.5, < 2.0','> 0.75, < 1.5','< 0.75')),colnames=c('Risk Category','Metals CCU (unitless)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$SpCondtable <- DT::renderDataTable({percentilesSpCond()})
+  output$riskTableSpCond <- DT::renderDataTable({
+    datatable(cbind(risk,SpCond=c('> 500','> 350, < 500','> 250, < 350','< 250')),colnames=c('Risk Category','Specific Conductivity (uS/cm)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$TDStable <- DT::renderDataTable({percentilesTDS()})
+  output$riskTableTDS <- DT::renderDataTable({
+    datatable(cbind(risk,TDS=c('> 350','> 250, < 350','> 100, < 250','< 100')),colnames=c('Risk Category','Total Dissolved Solids (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$DSulfatetable <- DT::renderDataTable({percentilesDSulfate()})
+  output$riskTableDSulfate <- DT::renderDataTable({
+    datatable(cbind(risk,DSulfate=c('> 75','> 25, < 75','> 10, < 25','< 10')),colnames=c('Risk Category','Dissolved Sulfate (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$DChloridetable <- DT::renderDataTable({percentilesDChloride()})
+  output$riskTableDChloride <- DT::renderDataTable({
+    datatable(cbind(risk,DSulfate=c('> 50','> 25, < 50','> 10, < 25','< 10')),colnames=c('Risk Category','Dissolved Chloride (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$DPotassiumtable <- DT::renderDataTable({percentilesDPotassium()})
+  output$riskTableDPotassium <- DT::renderDataTable({
+    datatable(cbind(risk,DPotassium=c('> 10','> 2, < 10','> 1, < 2','< 1')),colnames=c('Risk Category','Dissolved Potassium (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
+  output$DSodiumtable <- DT::renderDataTable({percentilesDSodium()})
+  output$riskTableDSodium <- DT::renderDataTable({
+    datatable(cbind(risk,DSodium=c('> 20','> 10, < 20','> 7, < 10','< 7')),colnames=c('Risk Category','Dissolved Sodium (mg/L)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(riskHightoLow,clrsDO[2:5]))})
 })
 
