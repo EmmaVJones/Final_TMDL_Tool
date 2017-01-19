@@ -54,10 +54,23 @@ shinyUI(fluidPage(theme="slate.css",
                                         tabPanel("Composite Table",br(),br(),h4('Composite Table'),DT::dataTableOutput('colors'),
                                                  column(6,DT::dataTableOutput('riskTableInfo'))),
                                         tabPanel("pH Summary",br(),br(),h4('pH Summary'),DT::dataTableOutput('pHtable'),column(6,DT::dataTableOutput('riskTablepH'))),
+                                        
+                                        
+                                        
                                         tabPanel("DO Summary",br(),br(),h4('DO Summary'),
                                                  DT::dataTableOutput('DOtable'),verbatimTextOutput('test'),
                                                  column(6,DT::dataTableOutput('riskTableDO')),
-                                                 column(6,h4('Statewide Dissolved Oxygen Percentile Graph'),plotOutput('DOplot'))),
+                                                 column(6,uiOutput("DOdataset"),
+                                                        #selectInput("DOdataset","Dataset:", 
+                                                        #              list("Virginia" = "Statewide", "Basin" = "Basin","Ecogregion"="Ecoregion","Order"="Order")),
+                                                        uiOutput("DOplot_"),
+                                                        plotOutput('DOplot'))),
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
                                         tabPanel("TN Summary",br(),br(),h4('TN Summary'),DT::dataTableOutput('TNtable'),column(6,DT::dataTableOutput('riskTableTN'))),
                                         navbarMenu("More",
                                                    tabPanel("TP Summary",br(),br(),h4('TP Summary'),DT::dataTableOutput('TPtable'),column(6,DT::dataTableOutput('riskTableTP'))),
