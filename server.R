@@ -1,8 +1,4 @@
 # Upload GIS data here to avoid uploading it twice (if it were in the global.R file)
-VAstationselect <- readRDS('data/VAstationselect2.RDS')
-dat4 <- readRDS('data/dat4_2.RDS')
-#cdfdata2 <- readRDS('data/AllcdfData.RDS')
-
 eco2 <- readOGR('data/','vaECOREGIONlevel3__proj84')
 supaB2 <- readOGR('data/','VAsuperbasins_proj84')
 
@@ -12,9 +8,9 @@ shinyServer(function(input, output, session) {
   ## Data Upload Tab, bring in chemistry/field data
   # Download data template
   output$downloadTemplate <- downloadHandler(filename=function(){'template.csv'},
-                                             content=function(file){write.csv(template,file)})
+                                             content=function(file){write.csv(template,file,row.names=FALSE)})
   
-  # Upload taxa list
+  # Upload site data
   inputFile <- reactive({inFile <- input$siteData
   if(is.null(inFile))
     return(NULL)
@@ -26,14 +22,28 @@ shinyServer(function(input, output, session) {
   stats <- reactive({inFile <- input$siteData
   if(is.null(inFile))
     return(NULL)
-  datamean <- select(template,-c(StationID,CollectionDateTime))%>%
+  datamean <- select(inputFile(),-c(StationID,CollectionDateTime,Longitude,Latitude))%>%
     summarise_each(funs(mean(., na.rm = TRUE)))%>%mutate(Statistic="Average")
-  datamedian <- select(template,-c(StationID,CollectionDateTime))%>%
+  datamedian <- select(inputFile(),-c(StationID,CollectionDateTime,Longitude,Latitude))%>%
     summarise_each(funs(median(., na.rm = TRUE)))%>%mutate(Statistic="Median")
   data_all <- rbind(datamean,datamedian)%>%select(Statistic,everything())
   return(data_all)
   })
+  
+  stats_wGIS <- reactive({
+    if(is.null(stats()))
+      return(NULL)
+    data_GIS <- reshape2::melt(stats(),c("Statistic"))%>%
+      dcast(variable~Statistic)%>%
+      mutate(StationID=unique(inputFile()$StationID),
+                       Longitude=unique(inputFile()$Longitude),
+                       Latitude=unique(inputFile()$Latitude))
+    return(data_GIS)
+    # dont know why I need to run all this extra code, debug later
+  })
+  
   output$summaryStats <- renderTable(stats())
+ 
  
   # Metals CCU Calculation
   mCCU <- reactive({
@@ -51,6 +61,8 @@ shinyServer(function(input, output, session) {
   
   # Output Colored datatable
   output$colors <- DT::renderDataTable({
+    if(is.null(stats()))
+      return(NULL)
     datatable(stats()) %>% formatStyle("pH", backgroundColor = styleInterval(brkspH, clrspH))%>%
       formatStyle("DO", backgroundColor = styleInterval(brksDO, clrsDO)) %>%
       formatStyle("TN", backgroundColor = styleInterval(brksTN, clrsTN))%>%
@@ -518,19 +530,24 @@ shinyServer(function(input, output, session) {
   })
   
   ## Map
-  colOptions <- data.frame(stressLevels=as.factor(c("non-stressor","low stress","medium stress","high stress")))
+  colOptions <- data.frame(stressLevels=as.factor(c("No Risk to Aquatic Life","Low Risk to Aquatic Life","Medium Risk to Aquatic Life","High Risk to Aquatic Life")))
   pal <- colorFactor(c("blue","limegreen","yellow","red"),levels=colOptions$stressLevels, ordered=T)
   # First interpret user selection to enable filtering)
   dataSelect <- reactive({switch(input$parameterToPlot
                                  ,'VSCI'='VSCIfactor','Dissolved Oxygen'='DOfactor'
                                  ,'pH'='pHfactor','Specific Conductivity'='SpCondfactor'
                                  ,'Total Phosphorus'='TPfactor','Total Nitrogen'='TNfactor'
-                                 ,'Total Habitat'='TotHabfactor')})
+                                 ,'Total Habitat'='TotHabfactor','Total Dissolved Solids'='TDS_Vfactor'
+                                 ,'Metals CCU'='MetalCCUfactor','LRBS'='LRBSfactor','Dissolved Sodium'='NA_Vfactor'
+                                 ,'Dissolved Potassium'='K_Vfactor','Dissolved Chloride'='Cl_Vfactor','Dissolved Sulfate'='Sf_Vfactor')})
   dataSelectcdf <- reactive({switch(input$parameterToPlot
                                     ,'Dissolved Oxygen'='DO','pH'='pH','Specific Conductivity'='SpCond'
-                                    ,'Total Phosphorus'='TP','Total Nitrogen'='TN','Total Habitat'='Total Habitat')})
+                                    ,'Total Phosphorus'='TP','Total Nitrogen'='TN','Total Habitat'='TotalHabitat'
+                                    ,'LRBS'='LRBS','Metals CCU'='MetalsCCU','Total Dissolved Solids'='TDS'
+                                    ,'Dissolved Sulfate'='DSulfate','Dissolved Chloride'='DChloride'
+                                    ,'Dissovled Potassium'='DPotassium','Dissolved Sodium'='DSodium')})
   filteredData <- reactive({
-    df2 <- subset(dat4,variable==dataSelect())
+    df2 <- subset(dat4,ParameterFactor==dataSelect())
   })
   
   
@@ -540,12 +557,41 @@ shinyServer(function(input, output, session) {
                 ,~max(Longitude),~max(Latitude))
   })
   
+  observe({if(input$showUserSite==TRUE){
+    #if(!is.null(stats_wGIS())){
+    leafletProxy('VAmap') %>%
+      addMarkers(data=stats_wGIS()[1,],~Longitude,~Latitude,
+                 popup=paste(sep= "<br/>",strong('User Input Site'),
+                             paste(strong("StationID: "),stats_wGIS()$StationID)))}
+  })
+  
+  output$colors2 <- DT::renderDataTable({
+    if(is.null(stats()))
+      return(NULL)
+    datatable(stats()) %>% formatStyle("pH", backgroundColor = styleInterval(brkspH, clrspH))%>%
+      formatStyle("DO", backgroundColor = styleInterval(brksDO, clrsDO)) %>%
+      formatStyle("TN", backgroundColor = styleInterval(brksTN, clrsTN))%>%
+      formatStyle("TP", backgroundColor = styleInterval(brksTP, clrsTP))%>%
+      formatStyle("TotalHabitat", backgroundColor = styleInterval(brksTotHab, clrsTotHab))%>%
+      formatStyle("LRBS", backgroundColor = styleInterval(brksLRBS, clrsLRBS))%>%
+      formatStyle("MetalsCCU", backgroundColor = styleInterval(brksMCCU, clrsMCCU))%>%
+      formatStyle("SpCond", backgroundColor = styleInterval(brksSpCond, clrsSpCond))%>%
+      formatStyle("TDS", backgroundColor = styleInterval(brksTDS, clrsTDS))%>%
+      formatStyle("DSulfate", backgroundColor = styleInterval(brksDS, clrsDS))%>%
+      formatStyle("DChloride", backgroundColor = styleInterval(brksDChl, clrsDChl))%>%
+      formatStyle("DPotassium", backgroundColor = styleInterval(brksDK, clrsDK))%>%
+      formatStyle("DSodium", backgroundColor = styleInterval(brksDNa, clrsDNa))
+  })
+  
   # Update map markers when user changes parameter
   observe({
     leafletProxy('VAmap',data=filteredData()) %>% clearMarkers() %>%
-      addCircleMarkers(color=~pal(value),fillOpacity=1,stroke=FALSE
-                       ,popup=paste(sep = "<br/>",strong("StationID: "),dat4$sampleID
-                                    ,strong("VSCI Score: "),prettyNum(dat4$VSCI,digits=3)))})
+      addCircleMarkers(color=~pal(ParameterFactorLevel),fillOpacity=1,stroke=FALSE
+                       ,popup=paste(sep = "<br/>",paste(strong("StationID: "),filteredData()$sampleID,sep="")
+                                    ,paste(strong("VSCI Score: "),prettyNum(filteredData()$VSCIAll,digits=3),sep="")
+                                    ,paste(strong(filteredData()$Parameter[1]),": ",
+                                           prettyNum(filteredData()$ParameterMeasure,digits=4)," ",
+                                           filteredData()$units,sep="")))})
   
   # Plot Ecoregion Shapefile
   observe({if(input$eco==TRUE){
@@ -565,7 +611,7 @@ shinyServer(function(input, output, session) {
   observe({
     proxy <- leafletProxy('VAmap',data=filteredData())
     proxy %>% clearControls() %>%
-      addLegend("bottomright",pal=pal, values=levels(as.factor(filteredData()$value)),title="Benthic TMDL Stressor Thresholds")})
+      addLegend("bottomright",pal=pal, values=levels(as.factor(filteredData()$ParameterFactorLevel)),title="Benthic TMDL Stressor Thresholds")})
   
   filteredDatacdf <- reactive({
     df <- subset(cdfdata,Indicator==dataSelectcdf() & Subpopulation=="Virginia")})

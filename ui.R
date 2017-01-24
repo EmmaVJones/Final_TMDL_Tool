@@ -49,8 +49,8 @@ shinyUI(fluidPage(theme="slate.css",
                                                                         "Fourth Order"="Fourth Order","Fifth Order"="Fifth Order"),selected=1)),
                                                  DT::dataTableOutput('inputTable'),
                                                  hr(),
-                                                 column(6,h3("Summary Statistics")),
-                                                 tableOutput("summaryStats")),
+                                                 column(6,h3("Summary Statistics"),
+                                                 tableOutput("summaryStats"))),
                                         tabPanel("Metals CCU Analysis",
                                                  h3("User Input Metals Data"),
                                                  helpText("Please use this form to calculate MetalsCCU data for the User Data tab if you
@@ -73,7 +73,7 @@ shinyUI(fluidPage(theme="slate.css",
                              tabPanel("Data Summary",
                                       column(12,tabsetPanel(
                                         tabPanel("Composite Table",br(),br(),h4('Composite Table'),DT::dataTableOutput('colors'),
-                                                 column(6,DT::dataTableOutput('riskTableInfo'))),
+                                                 column(3,DT::dataTableOutput('riskTableInfo'))),
                                         # pH Summary
                                         tabPanel("pH Summary",br(),br(),h4('pH Summary'),
                                                  DT::dataTableOutput('pHtable_Site'),
@@ -147,7 +147,6 @@ shinyUI(fluidPage(theme="slate.css",
                                                             DT::dataTableOutput('DPotassiumtable'),br(),
                                                             column(6,DT::dataTableOutput('riskTableDPotassium')),
                                                             column(6,uiOutput("DPotassiumdataset"), uiOutput("DPotassiumplot_"),plotOutput('DPotassiumplot'))),
-                                                   
                                                    # Dissolved Sodium Summary
                                                    tabPanel("Dissolved Sodium Summary",br(),br(),h4('Dissolved Sodium Summary'),
                                                             DT::dataTableOutput('DSodiumtable_Site'),
@@ -159,21 +158,27 @@ shinyUI(fluidPage(theme="slate.css",
                                       bootstrapPage(div(class="outer",
                                                         tags$style(type ="text/css",".outer {position: fixed; top: 41px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0}"),
                                                         leafletOutput('VAmap',width = '100%', height='100%'),
-                                                        absolutePanel(top=110, right=50, class="panel panel-default",fixed=T,
+                                                        absolutePanel(top=60, right=50, class="panel panel-default",fixed=T,
                                                                       draggable = T, left = 50,bottom="auto",height="auto",width=900,
-                                                                      p("The statewide map demonstrates water quality parameters as measured at XXXXXXX stations across Virginia. Users may display 
+                                                                      p("The statewide map demonstrates water quality parameters as measured at 474 stations across Virginia. Users may display 
                                                                         basin and ecoregion layers to give additional context to parameter variation. Risk categories for each parameter are consistent 
-                                                                        with breaks and color formatting utilized throughout the app.")),
-                                                        absolutePanel(top=190, right=10,class="panel panel-default",fixed=T,
-                                                                      draggable = T, left = "auto",bottom="auto",height="auto",width=300,
+                                                                        with breaks and color formatting utilized throughout the app.",span("(draggable)",style="color:red"))),
+                                                        absolutePanel(top=140, right=10,class="panel panel-default",fixed=T,style = "overflow-y:scroll; max-height: 400px",
+                                                                      draggable = T, left = "auto",bottom="auto",height=400,width=300,style = "overflow-x:scroll; max-width: 300px",
+                                                                      h6(span("(draggable)"),style="color:red"),
                                                                       selectInput("parameterToPlot"
                                                                                   ,label = 'Choose a water quality parameter to display'
-                                                                                  ,choices=c('','VSCI','Dissolved Oxygen','pH','Specific Conductivity'
-                                                                                             ,'Total Phosphorus','Total Nitrogen','Total Habitat')
+                                                                                  ,choices=c('','VSCI','pH','Dissolved Oxygen','Total Nitrogen','Total Phosphorus'
+                                                                                             ,'Total Habitat','LRBS','Metals CCU','Specific Conductivity','Total Dissolved Solids'
+                                                                                             ,'Dissolved Sulfate','Dissolved Chloride','Dissovled Potassium','Dissolved Sodium')
                                                                                   , selected=''),
                                                                       checkboxInput('showcdf','Show Statewide CDF Plot'),
                                                                       checkboxInput('eco','Show Ecoregions (Level III)',value=F),
-                                                                      checkboxInput('basins','Show Virginia Super Basins',value=F)),
+                                                                      checkboxInput('basins','Show Virginia Super Basins',value=F),
+                                                                      h5(strong("User Input Data")),
+                                                                      h6(span("(Requires user to upload data)"),style="color:red"),
+                                                                      checkboxInput('showUserSite','Show User Site',value=F),
+                                                                      DT::dataTableOutput("colors2")),
                                                         absolutePanel(bottom=10,left=10,height=200, width=300,draggable = T,
                                                                       conditionalPanel(condition="input.showcdf == true",
                                                                                        plotOutput("Statewidecdf", height = 200,width=300))

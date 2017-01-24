@@ -6,12 +6,14 @@ library(plyr)
 library(dplyr)
 library(DT)
 library(tidyr)
+library(reshape2)
 
 # Local data locations
-VAstationselect <- readRDS('data/VAstationselect2.RDS')
-dat4 <- readRDS('data/dat4_2.RDS')
+VAstationselect <- readRDS('data/VAstationselect_final.RDS')
+dat4 <- readRDS('data/dat4_final.RDS')
 cdfdata <- readRDS('data/cdfdataFINAL.RDS')
-template <- read.csv('data/template.csv')
+template <- read.csv('data/templateGIS.csv')
+metalsCDF <- readRDS('data/metalsCDF.RDS')
 
 # Color breaks and table formatting
 brkspH <- c(0,6,9)
