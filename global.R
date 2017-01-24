@@ -102,19 +102,13 @@ subFunction2 <- function(cdftable,userValue){
   return(filter(cdftable,Estimate.P==userValue))
 }
 
-#cdfsubset <- subFunction(cdfdata,"DO","Virginia")
-#cdfsubset2 <- subFunction(cdfdata,"DO","Northern Piedmont")
-#plot(cdfsubset$Value,cdfsubset$Estimate.P)
-#plot(cdfsubset2$Value,cdfsubset2$Estimate.P)
-
-#test <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
-#test2 <- percentileTable(stats,"DO",'James Basin','Piedmont','Fifth Order','2-JKS')
-
-
-#avg <- subFunction2(cdfsubset,82.51)
-#med <- subFunction2(cdfsubset,69.48)
-#avg <- filter(stats,Statistic=="Average") %>% select(DO) %>% rename(Value=DO) 
-
-#p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point()
-#p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-#  geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+# Metals CCU Calculation
+metalsCCUcalc <- function(Hardness,Arsenic,Chromium,Copper,Lead,Nickel,Zinc){
+  ArStand <- 150
+  ChromStand <- (exp(0.819*(log(Hardness))+0.6848))*0.86
+  CoStand <- (exp(0.8545*(log(Hardness))-1.702))*0.96
+  LdStand <- (exp(1.273*(log(Hardness))-3.259))
+  NiStand <- (exp(0.846*(log(Hardness))-0.884))*0.997
+  ZnStand <- (exp(0.8473*(log(Hardness))+0.884))*0.986
+  return(sum(Arsenic/ArStand,Chromium/ChromStand,Copper/CoStand,Lead/LdStand,Nickel/NiStand,Zinc/ZnStand))
+}

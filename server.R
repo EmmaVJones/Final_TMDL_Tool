@@ -35,6 +35,20 @@ shinyServer(function(input, output, session) {
   })
   output$summaryStats <- renderTable(stats())
  
+  # Metals CCU Calculation
+  mCCU <- reactive({
+    if(is.null(input$Hardness&input$Arsenic&input$Chromium&input$Copper&input$Lead&input$Nickel&input$Zinc))
+      return(NULL)
+    return(metalsCCUcalc(input$Hardness,input$Arsenic,input$Chromium,input$Copper,input$Lead,input$Nickel,input$Zinc))
+  })
+  
+  output$metalsTable <- renderTable({
+    if(is.null(mCCU))#|is.null(input$StationID&input$SampleDate))
+      return(data.frame(StationID=input$StationID,SampleDate=input$SampleDate,MetalsCCU=NA))
+    return(data.frame(StationID=input$StationID,SampleDate=input$SampleDate,MetalsCCU=mCCU()))
+  },  digits=4,border=TRUE)
+  output$test <- renderText({class(input$SampleDate)})
+  
   # Output Colored datatable
   output$colors <- DT::renderDataTable({
     datatable(stats()) %>% formatStyle("pH", backgroundColor = styleInterval(brkspH, clrspH))%>%
