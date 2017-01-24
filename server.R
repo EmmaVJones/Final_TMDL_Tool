@@ -1,6 +1,10 @@
 # Upload GIS data here to avoid uploading it twice (if it were in the global.R file)
-#eco2 <- readOGR('C:/HardDriveBackup/R/ShinyApp_TMDLworkgroup','vaECOREGIONlevel3__proj84')
-#supaB2 <- readOGR('C:/HardDriveBackup/R/ShinyApp_TMDLworkgroup','VAsuperbasins_proj84')
+VAstationselect <- readRDS('data/VAstationselect2.RDS')
+dat4 <- readRDS('data/dat4_2.RDS')
+#cdfdata2 <- readRDS('data/AllcdfData.RDS')
+
+eco2 <- readOGR('data/','vaECOREGIONlevel3__proj84')
+supaB2 <- readOGR('data/','VAsuperbasins_proj84')
 
 options(DT.options = list(dom = 't'))
 
@@ -499,23 +503,70 @@ shinyServer(function(input, output, session) {
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
   
+  ## Map
+  colOptions <- data.frame(stressLevels=as.factor(c("non-stressor","low stress","medium stress","high stress")))
+  pal <- colorFactor(c("blue","limegreen","yellow","red"),levels=colOptions$stressLevels, ordered=T)
+  # First interpret user selection to enable filtering)
+  dataSelect <- reactive({switch(input$parameterToPlot
+                                 ,'VSCI'='VSCIfactor','Dissolved Oxygen'='DOfactor'
+                                 ,'pH'='pHfactor','Specific Conductivity'='SpCondfactor'
+                                 ,'Total Phosphorus'='TPfactor','Total Nitrogen'='TNfactor'
+                                 ,'Total Habitat'='TotHabfactor')})
+  dataSelectcdf <- reactive({switch(input$parameterToPlot
+                                    ,'Dissolved Oxygen'='DO','pH'='pH','Specific Conductivity'='SpCond'
+                                    ,'Total Phosphorus'='TP','Total Nitrogen'='TN','Total Habitat'='Total Habitat')})
+  filteredData <- reactive({
+    df2 <- subset(dat4,variable==dataSelect())
+  })
+  
+  
+  output$VAmap <- renderLeaflet({
+    leaflet(VAstationselect) %>% addProviderTiles('Thunderforest.Outdoors') %>%
+      fitBounds(~min(Longitude),~min(Latitude)
+                ,~max(Longitude),~max(Latitude))
+  })
+  
+  # Update map markers when user changes parameter
+  observe({
+    leafletProxy('VAmap',data=filteredData()) %>% clearMarkers() %>%
+      addCircleMarkers(color=~pal(value),fillOpacity=1,stroke=FALSE
+                       ,popup=paste(sep = "<br/>",strong("StationID: "),dat4$sampleID
+                                    ,strong("VSCI Score: "),prettyNum(dat4$VSCI,digits=3)))})
+  
+  # Plot Ecoregion Shapefile
+  observe({if(input$eco==TRUE){
+    leafletProxy('VAmap') %>% 
+      addPolygons(data=eco2, fill = 0.4, stroke = 0.2, color = 'gray',group = "US_L3NAME"
+                  ,popup=paste('Ecoregion: ',eco2@data$US_L3NAME))
+  }else(leafletProxy('VAmap')%>%clearGroup('US_L3NAME'))})
+  
+  # Plot Basin shapefile
+  observe({if(input$basins==TRUE){
+    leafletProxy('VAmap') %>% 
+      addPolygons(data=supaB2,fill=0.4,stroke=0.2,color='brown',group='SUPERBASIN'
+                  ,popup=paste('Superbasin: ',supaB2@data$SUPERBASIN))
+  }else(leafletProxy('VAmap')%>%clearGroup('SUPERBASIN'))})
+  
+  # Separate observe() to recreate legend as needed
+  observe({
+    proxy <- leafletProxy('VAmap',data=filteredData())
+    proxy %>% clearControls() %>%
+      addLegend("bottomright",pal=pal, values=levels(as.factor(filteredData()$value)),title="Benthic TMDL Stressor Thresholds")})
+  
+  filteredDatacdf <- reactive({
+    df <- subset(cdfdata,Indicator==dataSelectcdf() & Subpopulation=="Virginia")})
+  
+  output$Statewidecdf <- renderPlot({if(input$showcdf==T){
+    if(input$parameterToPlot!='VSCI'){
+      p <- ggplot(filteredDatacdf(), aes(Value,Estimate.P))+
+        labs(list(title=paste("Statewide",input$parameterToPlot,"\nPercentile Graph")
+                  ,x=input$parameterToPlot,y='Statewide Percentile'))
+      #xlab(paste(input$parameterToPlot," ",correctUnits)+ylab('Statewide Percentile') # need to work on Units!
+      p+geom_point()+theme_minimal()+geom_line(aes(y=LCB95Pct.P),colour='gray')+
+        geom_line(aes(y=UCB95Pct.P),colour='gray')
+      #plot(filteredDatacdf()$Value,filteredDatacdf()$Estimate.P)
+      #lines(filteredDatacdf()$Value,filteredDatacdf()$LCB95Pct.P)
+      #lines(filteredDatacdf()$Value,filteredDatacdf()$UCB95Pct.P)
+      }}})
+  
 })
-
-#output$test <- reactive({
-#  if(is.null(percentilesDO()))
-#    return(NULL)
-#  input$DOdataset_})
-#percentilesDO()$Statistic})
-#as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[3])})
-#x1 <- subset(percentilesDO(),Statistic==input$DOdataset_)
-#return(x1)})#%>%select(Average)})
-
-
-#output$DOplot <- renderPlot({
-#  cdfsubset <- subFunction(cdfdata,"DO","Virginia")
-#  avg <- subFunction2(cdfsubset,percentilesDO()$Average[2])
-#  med <- subFunction2(cdfsubset,percentilesDO()$Median[2])
-#  p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile")
-#  p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-#    geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-#})

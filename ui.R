@@ -133,10 +133,30 @@ shinyUI(fluidPage(theme="slate.css",
                                                             DT::dataTableOutput('DSodiumtable'),br(),
                                                             column(6,DT::dataTableOutput('riskTableDSodium')),
                                                             column(6,uiOutput("DSodiumdataset"), uiOutput("DSodiumplot_"),plotOutput('DSodiumplot'))))
-                                                   
-                                                   
-                                                   
-                                      )))
+                                                   ))),
+                             tabPanel("Statewide Map",
+                                      bootstrapPage(div(class="outer",
+                                                        tags$style(type ="text/css",".outer {position: fixed; top: 41px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0}"),
+                                                        leafletOutput('VAmap',width = '100%', height='100%'),
+                                                        absolutePanel(top=110, right=50, class="panel panel-default",fixed=T,
+                                                                      draggable = T, left = 50,bottom="auto",height="auto",width=900,
+                                                                      p("The statewide map demonstrates water quality parameters as measured at XXXXXXX stations across Virginia. Users may display 
+                                                                        basin and ecoregion layers to give additional context to parameter variation. Risk categories for each parameter are consistent 
+                                                                        with breaks and color formatting utilized throughout the app.")),
+                                                        absolutePanel(top=190, right=10,class="panel panel-default",fixed=T,
+                                                                      draggable = T, left = "auto",bottom="auto",height="auto",width=300,
+                                                                      selectInput("parameterToPlot"
+                                                                                  ,label = 'Choose a water quality parameter to display'
+                                                                                  ,choices=c('','VSCI','Dissolved Oxygen','pH','Specific Conductivity'
+                                                                                             ,'Total Phosphorus','Total Nitrogen','Total Habitat')
+                                                                                  , selected=''),
+                                                                      checkboxInput('showcdf','Show Statewide CDF Plot'),
+                                                                      checkboxInput('eco','Show Ecoregions (Level III)',value=F),
+                                                                      checkboxInput('basins','Show Virginia Super Basins',value=F)),
+                                                        absolutePanel(bottom=10,left=10,height=200, width=300,draggable = T,
+                                                                      conditionalPanel(condition="input.showcdf == true",
+                                                                                       plotOutput("Statewidecdf", height = 200,width=300))
+                                                        ))))
                   ))
 )
                                                                  
