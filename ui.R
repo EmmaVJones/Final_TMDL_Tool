@@ -18,12 +18,12 @@ shinyUI(fluidPage(theme="slate.css",
                              tabPanel("Data Upload",
                                       column(4,wellPanel(
                                         h4("Instructions:"),
-                                        p("Please upload site chemistry and field parameter data in either a flat file (.csv). 
+                                        p("Please upload site chemistry and field parameter data as a flat file (.csv). 
                                           All data uploaded to the app must be formatted correctly. If you are unsure whether 
                                           your data is in the correct format, please download the 'template.csv' file first to 
                                           check your data structure."),
                                         downloadButton('downloadTemplate',"Download template.csv"),
-                                        fileInput('siteData','Upload Sites (flat file)',accept='.csv',width='100%'))),
+                                        fileInput('siteData','Upload Site (flat file)',accept='.csv',width='100%'))),
                                       column(8,tabsetPanel(
                                         tabPanel("User Data",
                                                  h3("User Uploaded Data"),
@@ -51,7 +51,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                  hr(),
                                                  column(6,h3("Summary Statistics"),
                                                  tableOutput("summaryStats"))),
-                                        tabPanel("Metals CCU Analysis",
+                                        tabPanel("Metals CCU Analysis, Single Site",
                                                  h3("User Input Metals Data"),
                                                  helpText("Please use this form to calculate MetalsCCU data for the User Data tab if you
                                                           have not done so already. Input StationID, Date, and associated metals data then
@@ -181,8 +181,34 @@ shinyUI(fluidPage(theme="slate.css",
                                                                       DT::dataTableOutput("colors2")),
                                                         absolutePanel(bottom=10,left=10,height=200, width=300,draggable = T,
                                                                       conditionalPanel(condition="input.showcdf == true",
-                                                                                       plotOutput("Statewidecdf", height = 200,width=300))
-                                                        ))))
+                                                                                       plotOutput("Statewidecdf", height = 200,width=300)))))),
+                             tabPanel("Dissolved Metals",
+                                      column(4,wellPanel(
+                                        h4("Instructions:"),
+                                        p("Please upload dissolved metals data as a flat file (.csv). This section of the app allows
+                                          for multiple sites to be uploaded. All data uploaded to the app must be formatted correctly. If you are unsure whether 
+                                          your data is in the correct format, please download the 'template_metals.csv' file first to 
+                                          check your data structure."),
+                                        downloadButton('downloadTemplate_metals',"Download template_metals.csv"),
+                                        fileInput('siteData_metals','Upload Dissolved Metals (flat file)',accept='.csv',width='100%'))),
+                                      column(8,tabsetPanel(
+                                        tabPanel("User Data",
+                                                 h3("User Uploaded Data"),
+                                                 h5("Please review data to ensure all fields are correct."),
+                                                 DT::dataTableOutput('inputTable_metals'),
+                                                 hr(),
+                                                 #verbatimTextOutput('test'),
+                                                 column(6,h3("Metals CCU Analysis"),
+                                                        tableOutput("summary_MetalsCCU"))),
+                                        tabPanel("Data Summary",
+                                                 h4("Select Site to Review"),
+                                                 uiOutput("metalsSiteSelection"),
+                                                 column(6,
+                                                 DT::dataTableOutput('colors_metals')),
+                                                 column(6,plotOutput('dissolvedmetalscdf'))
+                                                 
+                                                 ))))
+                                      
                   ))
 )
                                                                  

@@ -13,7 +13,20 @@ VAstationselect <- readRDS('data/VAstationselect_final.RDS')
 dat4 <- readRDS('data/dat4_final.RDS')
 cdfdata <- readRDS('data/cdfdataFINAL.RDS')
 template <- read.csv('data/templateGIS.csv')
+template_metals <- read.csv('data/template_metals.csv')
 metalsCDF <- readRDS('data/metalsCDF.RDS')
+
+
+# Add units to cdfdata final
+cdfdata2 <- mutate(cdfdata,units=Indicator)
+cdfdata2$units <- dplyr::recode(cdfdata2$units,"DChloride"="mg/L","DO"="mg/L","DPotassium"="mg/L","DSodium"="mg/L","DSulfate"="mg/L",
+                                "LRBS"="(unitless)", "MetalsCCU"="(unitless)","pH"="(unitless)","SpCond"="uS/cm","TDS"="mg/L",
+                                "TN"="mg/L","TotalHabitat"="(unitless)","TP"="mg/L","ANTIMONY"="ug/L","ALUMINUM"="ug/L",
+                                "ARSENIC"="ug/L","BARIUM"="ug/L","BERY"="ug/L","CADMIUM"="ug/L","CALCUIM"="mg/L","CHROMIUM"="ug/L",
+                                "COPPER"="ug/L","IRON"="ug/L","LEAD"="ug/L","MAGN"="mg/L","MANGANESE"="ug/L","NICKEL"="ug/L",
+                                "SELENIUM"="ug/L","SILVER"="ug/L","THALLIUM"="ug/L","ZINC"="ug/L","HARDNESS"="mg/L")    
+saveRDS(cdfdata2,'data/cdfdataFINAL.RDS')                               
+
 
 # Color breaks and table formatting
 brkspH <- c(0,6,9)
@@ -113,4 +126,20 @@ metalsCCUcalc <- function(Hardness,Arsenic,Chromium,Copper,Lead,Nickel,Zinc){
   NiStand <- (exp(0.846*(log(Hardness))-0.884))*0.997
   ZnStand <- (exp(0.8473*(log(Hardness))+0.884))*0.986
   return(sum(Arsenic/ArStand,Chromium/ChromStand,Copper/CoStand,Lead/LdStand,Nickel/NiStand,Zinc/ZnStand))
+}
+# Metals CCU Calculation for dataframes
+metalsCCUcalcDF <- function(df){
+  Hardness <- df$Hardness
+  Arsenic <- df$Arsenic
+  Chromium <- df$Chromium
+  Copper <- df$Copper
+  Lead <- df$Lead
+  Nickel <- df$Nickel 
+  Zinc <- df$Zinc
+  met <- data.frame(MetalsCCU=NA)
+  for(i in 1:nrow(df)){
+    met[i,] <- metalsCCUcalc(df$Hardness[i],df$Arsenic[i],df$Chromium[i],df$Copper[i],df$Lead[i],df$Nickel[i],df$Zinc[i])
+  }
+  return(met)
+  #return(list(df$Hardness,df$Arsenic,df$Chromium,df$Copper,df$Lead,df$Nickel,df$Zinc))
 }
