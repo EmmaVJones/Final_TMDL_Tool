@@ -121,7 +121,17 @@ metalsCDF <- read_excel("data/DissMetalStatus.CDF.xlsx",sheet="biostatus.CDF")%>
   select(-c(Type))%>%
   filter(!(Subpopulation=='Subpopulation'|is.na(Subpopulation)))
 cdfdata2 <- rbind(cdfdata2,metalsCDF)
-saveRDS(cdfdata2,'data/cdfdataFINAL.RDS')
+
+# Add units to cdfdata final
+cdfdata2 <- mutate(cdfdata,units=Indicator)
+cdfdata2$units <- dplyr::recode(cdfdata2$units,"DChloride"="mg/L","DO"="mg/L","DPotassium"="mg/L","DSodium"="mg/L","DSulfate"="mg/L",
+                                "LRBS"="(unitless)", "MetalsCCU"="(unitless)","pH"="(unitless)","SpCond"="uS/cm","TDS"="mg/L",
+                                "TN"="mg/L","TotalHabitat"="(unitless)","TP"="mg/L","ANTIMONY"="ug/L","ALUMINUM"="ug/L",
+                                "ARSENIC"="ug/L","BARIUM"="ug/L","BERY"="ug/L","CADMIUM"="ug/L","CALCUIM"="mg/L","CHROMIUM"="ug/L",
+                                "COPPER"="ug/L","IRON"="ug/L","LEAD"="ug/L","MAGN"="mg/L","MANGANESE"="ug/L","NICKEL"="ug/L",
+                                "SELENIUM"="ug/L","SILVER"="ug/L","THALLIUM"="ug/L","ZINC"="ug/L","HARDNESS"="mg/L")    
+cdfdata2$Indicator <- dplyr::recode(cdfdata2$Indicator,'CALCUIM'='CALCIUM','BERY'='BERYLLIUM','MAGN'='MAGNESIUM')
+saveRDS(cdfdata2,'data/cdfdataFINAL.RDS')                               
 
 
 # Work up new Dissolved Metals data

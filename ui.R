@@ -55,7 +55,8 @@ shinyUI(fluidPage(theme="slate.css",
                                                  h3("User Input Metals Data"),
                                                  helpText("Please use this form to calculate MetalsCCU data for the User Data tab if you
                                                           have not done so already. Input StationID, Date, and associated metals data then
-                                                          scroll down to view MetalsCCU result."),
+                                                          scroll down to view MetalsCCU result. If you have more than one site to analyze for
+                                                          MetalsCCU, use the Dissolved Metals Tab at the top of the navigation pane."),
                                                  column(6,textInput("StationID",h5("StationID"), value = "")),
                                                  column(6,textInput("SampleDate",h5("Sample Date (MM-DD-YYYY)"), value = "")),
                                                  column(6,
@@ -197,15 +198,21 @@ shinyUI(fluidPage(theme="slate.css",
                                                  h5("Please review data to ensure all fields are correct."),
                                                  DT::dataTableOutput('inputTable_metals'),
                                                  hr(),
-                                                 #verbatimTextOutput('test'),
                                                  column(6,h3("Metals CCU Analysis"),
-                                                        tableOutput("summary_MetalsCCU"))),
+                                                        tableOutput("summary_MetalsCCU"),
+                                                        helpText('You can copy/paste these values into your spreadsheet for upload
+                                                                 back to this app or use it for additional analyses.'))),
                                         tabPanel("Data Summary",
-                                                 h4("Select Site to Review"),
-                                                 uiOutput("metalsSiteSelection"),
+                                                 h4("Dissolved Metals Statewide"),
+                                                 uiOutput("metalsSitesUI"),
+                                                 helpText("After uploading data from one or more sites on the previous tab ('User Data'), 
+                                                          you will be able to scroll through sites to analyze dissolved metals against
+                                                          statewide percentiles."),
                                                  column(6,
-                                                 DT::dataTableOutput('colors_metals')),
+                                                        verbatimTextOutput('test'),
+                                                        DT::dataTableOutput('colors_metals')),
                                                  column(6,plotOutput('dissolvedmetalscdf'))
+                                                 
                                                  
                                                  ))))
                                       

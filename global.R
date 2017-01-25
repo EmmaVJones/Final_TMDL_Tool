@@ -16,18 +16,6 @@ template <- read.csv('data/templateGIS.csv')
 template_metals <- read.csv('data/template_metals.csv')
 metalsCDF <- readRDS('data/metalsCDF.RDS')
 
-
-# Add units to cdfdata final
-cdfdata2 <- mutate(cdfdata,units=Indicator)
-cdfdata2$units <- dplyr::recode(cdfdata2$units,"DChloride"="mg/L","DO"="mg/L","DPotassium"="mg/L","DSodium"="mg/L","DSulfate"="mg/L",
-                                "LRBS"="(unitless)", "MetalsCCU"="(unitless)","pH"="(unitless)","SpCond"="uS/cm","TDS"="mg/L",
-                                "TN"="mg/L","TotalHabitat"="(unitless)","TP"="mg/L","ANTIMONY"="ug/L","ALUMINUM"="ug/L",
-                                "ARSENIC"="ug/L","BARIUM"="ug/L","BERY"="ug/L","CADMIUM"="ug/L","CALCUIM"="mg/L","CHROMIUM"="ug/L",
-                                "COPPER"="ug/L","IRON"="ug/L","LEAD"="ug/L","MAGN"="mg/L","MANGANESE"="ug/L","NICKEL"="ug/L",
-                                "SELENIUM"="ug/L","SILVER"="ug/L","THALLIUM"="ug/L","ZINC"="ug/L","HARDNESS"="mg/L")    
-saveRDS(cdfdata2,'data/cdfdataFINAL.RDS')                               
-
-
 # Color breaks and table formatting
 brkspH <- c(0,6,9)
 clrspH <- c("gray","yellow","limegreen","yellow")
@@ -107,6 +95,16 @@ percentileTable <- function(statsTable,parameter,userBasin,userEco,userOrder,sta
   order2 <- data.frame(Statistic=userOrder,Average=vlookup(out$Average,order,2,TRUE),Median=vlookup(out$Median,order,2,TRUE))
   out_final <- rbind(out,va2,basin2,eco2,order2)
   return(out_final)
+}
+
+percentileTable_metals <- function(measurementTable,parameter,stationName){
+  sub <- filter(measurementTable,StationID==stationName)%>%select_("StationID",parameter)
+  parametercap <- toupper(parameter)
+  unit <- filter(cdfdata,Subpopulation=="Virginia",Indicator==parametercap)
+  va <- filter(cdfdata,Subpopulation=="Virginia",Indicator==parametercap)%>%select(Value,Estimate.P)
+  final <- data.frame(Dissolved_Metal=paste(parameter," (",unit$units[1],")",sep=""),Measure=sub[,2],
+                      Statewide_Percentile=vlookup(sub[,2],va,2,TRUE))
+  return(final)
 }
 
 subFunction <- function(cdftable,parameter,userInput){
