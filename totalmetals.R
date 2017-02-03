@@ -34,6 +34,7 @@ output$colors_metals <- DT::renderDataTable({
 
 
 
+
 # Dissolved Metals Lookup Functions
 percentilesCalcium <- reactive({
   if(is.null(metalsCCU_results()))
@@ -112,10 +113,13 @@ percentilesHardness <- reactive({
     return(NULL)
   return(percentileTable_metals(inputFile_metals(),'Hardness',input$metalsSites_))})
 
-final <- rbind(Calcium,Magnesium,Arsenic,Barium,Beryllium,Cadmium,Chromium,Copper,Iron,
-                 Lead,Manganese,Thallium,Nickel,Silver,Zinc,Antimony,Aluminum,Selenium,Hardness)
-
 output$colors_metals <- DT::renderDataTable({
   if(is.null(inputFile_metals()))
-    return(NULL)
-  percentilesDissolvedMetals()})
+    return(NULL)  
+  datatable(rbind(percentilesCalcium(),percentilesMagnesium(),percentilesArsenic(),percentilesBarium(),percentilesBeryllium(),percentilesCadmium(),percentilesChromium(),percentilesCopper(),percentilesIron(),
+                  percentilesLead(),percentilesManganese(),percentilesThallium(),percentilesNickel(),percentilesSilver(),percentilesZinc(),percentilesAntimony(),percentilesAluminum(),percentilesSelenium(),percentilesHardness()),
+            options=list(pageLength=20))
+})
+
+
+

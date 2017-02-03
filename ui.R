@@ -211,7 +211,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                                       conditionalPanel(condition="input.showcdf == true",
                                                                                        plotOutput("Statewidecdf", height = 200,width=300)))))),
                              tabPanel("Dissolved Metals",
-                                      column(4,wellPanel(
+                                      column(3,wellPanel(
                                         h4("Instructions:"),
                                         p("Please upload dissolved metals data as a flat file (.csv). This section of the app allows
                                           for multiple sites to be uploaded. All data uploaded to the app must be formatted correctly. If you are unsure whether 
@@ -219,7 +219,7 @@ shinyUI(fluidPage(theme="slate.css",
                                           check your data structure."),
                                         downloadButton('downloadTemplate_metals',"Download template_metals.csv"),
                                         fileInput('siteData_metals','Upload Dissolved Metals (flat file)',accept='.csv',width='100%'))),
-                                      column(8,tabsetPanel(
+                                      column(9,tabsetPanel(
                                         tabPanel("User Data",
                                                  h3("User Uploaded Data"),
                                                  h5("Please review data to ensure all fields are correct."),
@@ -230,15 +230,23 @@ shinyUI(fluidPage(theme="slate.css",
                                                         helpText('You can copy/paste these values into your spreadsheet for upload
                                                                  back to this app or use it for additional analyses.'))),
                                         tabPanel("Data Summary",
+                                                 fluidPage(
+                                                 fluidRow(column(5,
                                                  h4("Dissolved Metals Statewide"),
                                                  uiOutput("metalsSitesUI"),
                                                  helpText("After uploading data from one or more sites on the previous tab ('User Data'), 
                                                           you will be able to scroll through sites to analyze dissolved metals against
                                                           statewide percentiles."),
-                                                 column(6,
-                                                        verbatimTextOutput('test'),
-                                                        DT::dataTableOutput('colors_metals')),
-                                                 column(6,plotOutput('dissolvedmetalscdf'))
+                                                 br(),br(),br(),br(),br(),br(),br(),br(),
+                                                 DT::dataTableOutput('colors_metals')),
+                                                 column(5,br(),br(),
+                                                        uiOutput('dMetal'),
+                                                        uiOutput('dMetalplot_'),
+                                                        plotOutput('dissolvedmetalscdf'))
+                                                        
+                                                 ))
+                                                 
+                                                 
                                                  
                                                  
                                                  ))))

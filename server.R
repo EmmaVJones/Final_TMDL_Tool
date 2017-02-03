@@ -666,89 +666,75 @@ shinyServer(function(input, output, session) {
   })
  
   # Dissolved Metals Lookup Functions
-  percentilesCalcium <- reactive({
+  percentilesDissolvedMetals <- reactive({
     if(is.null(metalsCCU_results()))
       return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Calcium',input$metalsSites_))})
-  percentilesMagnesium <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Magnesium',input$metalsSites_))})
-  percentilesArsenic <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Arsenic',input$metalsSites_))})
-  percentilesBarium <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Barium',input$metalsSites_))})
-  percentilesBeryllium <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Beryllium',input$metalsSites_))})
-  percentilesCadmium <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Cadmium',input$metalsSites_))})
-  percentilesChromium <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Chromium',input$metalsSites_))})
-  percentilesCopper <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Copper',input$metalsSites_))})
-  percentilesIron <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Iron',input$metalsSites_))})
-  percentilesLead <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Lead',input$metalsSites_))})
-  percentilesManganese <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Manganese',input$metalsSites_))})
-  percentilesThallium <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Thallium',input$metalsSites_))})
-  percentilesNickel <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Nickel',input$metalsSites_))})
-  percentilesSilver <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Silver',input$metalsSites_))})
-  percentilesZinc <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Zinc',input$metalsSites_))})
-  percentilesAntimony <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Antimony',input$metalsSites_))})
-  percentilesAluminum <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Aluminum',input$metalsSites_))})
-  percentilesSelenium <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Selenium',input$metalsSites_))})
-  percentilesHardness <- reactive({
-    if(is.null(metalsCCU_results()))
-      return(NULL)
-    return(percentileTable_metals(inputFile_metals(),'Hardness',input$metalsSites_))})
+    Calcium <- percentileTable_metals(inputFile_metals(),'Calcium',input$metalsSites_)
+    Magnesium <- percentileTable_metals(inputFile_metals(),'Magnesium',input$metalsSites_)
+    Arsenic <- percentileTable_metals(inputFile_metals(),'Arsenic',input$metalsSites_)
+    Barium <- percentileTable_metals(inputFile_metals(),'Barium',input$metalsSites_)
+    Beryllium <- percentileTable_metals(inputFile_metals(),'Beryllium',input$metalsSites_)
+    Cadmium <- percentileTable_metals(inputFile_metals(),'Cadmium',input$metalsSites_)
+    Chromium <- percentileTable_metals(inputFile_metals(),'Chromium',input$metalsSites_)
+    Copper <- percentileTable_metals(inputFile_metals(),'Copper',input$metalsSites_)
+    Iron <- percentileTable_metals(inputFile_metals(),'Iron',input$metalsSites_)
+    Lead <- percentileTable_metals(inputFile_metals(),'Lead',input$metalsSites_)
+    Manganese <- percentileTable_metals(inputFile_metals(),'Manganese',input$metalsSites_)
+    Thallium <- percentileTable_metals(inputFile_metals(),'Thallium',input$metalsSites_)
+    Nickel <- percentileTable_metals(inputFile_metals(),'Nickel',input$metalsSites_)
+    Silver <- percentileTable_metals(inputFile_metals(),'Silver',input$metalsSites_)
+    Zinc <- percentileTable_metals(inputFile_metals(),'Zinc',input$metalsSites_)
+    Antimony <- percentileTable_metals(inputFile_metals(),'Antimony',input$metalsSites_)
+    Aluminum <- percentileTable_metals(inputFile_metals(),'Aluminum',input$metalsSites_)
+    Selenium <- percentileTable_metals(inputFile_metals(),'Selenium',input$metalsSites_)
+    Hardness <- percentileTable_metals(inputFile_metals(),'Hardness',input$metalsSites_)
+    final <- rbind(Calcium,Magnesium,Arsenic,Barium,Beryllium,Cadmium,Chromium,Copper,Iron,
+                   Lead,Manganese,Thallium,Nickel,Silver,Zinc,Antimony,Aluminum,Selenium,Hardness)
+    return(final)
+  })
   
   output$colors_metals <- DT::renderDataTable({
     if(is.null(inputFile_metals()))
-      return(NULL)  
-  rbind(percentilesCalcium(),percentilesMagnesium(),percentilesArsenic(),percentilesBarium(),percentilesBeryllium(),percentilesCadmium(),percentilesChromium(),percentilesCopper(),percentilesIron(),
-        percentilesLead(),percentilesManganese(),percentilesThallium(),percentilesNickel(),percentilesSilver(),percentilesZinc(),percentilesAntimony(),percentilesAluminum(),percentilesSelenium(),percentilesHardness())
+      return(NULL)
+    datatable(percentilesDissolvedMetals(),options=list(pageLength=20))})
+ 
+  # Choose Dissolved Metal to display
+  output$dMetal <- renderUI({
+    selectInput("dMetal_","Select Dissolved Metal to Plot",names(inputFile_metals()[5:23]))
+  })
+  output$dMetalplot_ <- renderUI({
+    plotOutput("p_dMetal")
   })
   
-  output$test <- renderPrint({percentileTable_metals(inputFile_metals(),'Manganese',input$metalsSites_)})
+  # Updating dissolved metals cdf plot
+  output$p_dMetal <- renderPlot({
+    if(is.null(inputFile_metals))
+      return(NULL)
+    parametercap <- toupper(input$dMetal_)
+    cdfsubset <- subFunction(cdfdata,parametercap,"Virginia")
+    pct1 <- cbind(percentilesDissolvedMetals(),metal=sub(" .*","",percentilesDissolvedMetals()$Dissolved_Metal))%>%
+      filter(metal==input$dMetal_)
+    pct <- subFunction2(cdfsubset,pct1[,3])
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x=as.character(pct1[1,1]),y="Percentile") +
+        ggtitle(paste("Virginia ",input$dMetal_," Percentile Graph")) + 
+        theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+        theme(axis.title = element_text(face='bold',size=12))
+    p1+ geom_point(data=pct,color='orange',size=4)
+    
+  },height = 250,width=325)
+ 
+  # In case need to test cdf output
+  
+  
+  #output$test <- renderTable({
+  #  if(is.null(inputFile_metals))
+  #    return(NULL)
+  #  parametercap <- toupper(input$dMetal_)
+  #  cdfsubset <- subFunction(cdfdata,parametercap,"Virginia")
+  #  pct1 <- mutate(percentilesDissolvedMetals(),metal=sub(" .*","",final$Dissolved_Metal))%>%
+  #    filter(metal==input$dMetal_)
+  #  pct <- subFunction2(cdfsubset,pct1[,3])
+  #  return(pct[,3:8])
+  #})
+  
 })
