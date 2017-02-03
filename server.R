@@ -587,10 +587,10 @@ shinyServer(function(input, output, session) {
     leafletProxy('VAmap',data=filteredData()) %>% clearMarkers() %>%
       addCircleMarkers(color=~pal(ParameterFactorLevel),fillOpacity=1,stroke=FALSE
                        ,popup=paste(sep = "<br/>",paste(strong("StationID: "),filteredData()$sampleID,sep="")
-                                    ,paste(strong("VSCI Score: "),prettyNum(filteredData()$VSCIAll,digits=3),sep="")
-                                    ,paste(strong(filteredData()$Parameter[1]),": ",
-                                           prettyNum(filteredData()$ParameterMeasure,digits=4)," ",
-                                           filteredData()$units,sep="")))})
+                                           ,paste(strong("VSCI Score: "),prettyNum(filteredData()$VSCIAll,digits=3),sep="")
+                                           ,paste(strong(filteredData()$Parameter[1]),": ",
+                                                  prettyNum(filteredData()$ParameterMeasure,digits=4)," ",
+                                                  filteredData()$units,sep="")))})
   
   # Plot Ecoregion Shapefile
   observe({if(input$eco==TRUE){

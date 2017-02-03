@@ -57,6 +57,9 @@ VAstationselect$Cl_Vfactor <- cut(VAstationselect$Cl_V,c(0,10,25,50,500)
                                   ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
 VAstationselect$Sf_Vfactor <- cut(VAstationselect$Sf_V,c(0,10,25,75,500)
                                   ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+VAstationselect$VSCIfactor <- cut(VAstationselect$VSCIAll,c(0,42,60,72,115)
+                                  ,labels=c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')) 
+
 
 # double check all factors came in correctly
 str(VAstationselect)
@@ -66,27 +69,28 @@ str(VAstationselect)
 colOptions <- data.frame(stressLevels=as.factor(c("No Risk to Aquatic Life","Low Risk to Aquatic Life","Medium Risk to Aquatic Life","High Risk to Aquatic Life")))
 pal <- colorFactor(c("blue","limegreen","yellow","red"),levels=colOptions$stressLevels, ordered=T)
 
-parameterList <- as.factor(c('DO','pH','SpCond','TP','TN','TotHab',"TDS_V","MetalCCU","LRBS","NA_V","K_V","Cl_V","Sf_V"))
+parameterList <- as.factor(c('VSCIAll','DO','pH','SpCond','TP','TN','TotHab',"TDS_V","MetalCCU","LRBS","NA_V","K_V","Cl_V","Sf_V"))
 
 saveRDS(VAstationselect,'data/VAstationselect_final.RDS')
 
 # Make new dat4 dataset
-VAstationselect_ <- select(VAstationselect,-c(Year,DO,pH,SpCond,TP,TN,TotHab,TDS_V,MetalCCU,LRBS,
-                                              NA_V,K_V,Cl_V,Sf_V))%>%
+VAstationselect_ <- mutate(VAstationselect,VSCI=VSCIAll)%>%
+  select(-c(Year,VSCI,DO,pH,SpCond,TP,TN,TotHab,TDS_V,MetalCCU,LRBS,NA_V,K_V,Cl_V,Sf_V))%>%
   reshape2::melt(id=c('sampleID',"Longitude","Latitude","Basin" ,"VSCIAll"))%>%
   filter(!is.na(value))%>%
   mutate(joincolumn=gsub("(.*)f.*","\\1",variable))
 
 # do the same with regular data so it iwll be available for a popup in the final leaflet map
-VAstationselect_1 <- select(VAstationselect,c(sampleID,Longitude,Latitude,Basin,VSCIAll,DO,pH,SpCond,TP,TN,TotHab,TDS_V,MetalCCU,LRBS,
-                                              NA_V,K_V,Cl_V,Sf_V))%>%
+VAstationselect_1 <- mutate(VAstationselect,VSCI=VSCIAll)%>%
+  select(c(sampleID,Longitude,Latitude,Basin,VSCIAll,VSCI,DO,pH,SpCond,TP,TN,TotHab,TDS_V,
+           MetalCCU,LRBS,NA_V,K_V,Cl_V,Sf_V))%>%
   reshape2::melt(id=c('sampleID',"Longitude","Latitude","Basin" ,"VSCIAll"))%>%
   filter(!is.na(value))%>%mutate(joincolumn=variable)%>%
   merge(VAstationselect_,by=c('joincolumn','sampleID',"Longitude","Latitude","Basin" ,"VSCIAll"))%>%
   rename(Parameter=variable.x,ParameterMeasure=value.x,ParameterFactor=variable.y,ParameterFactorLevel=value.y)%>%
   select(-joincolumn)%>%
   mutate(units=Parameter)# make column with units for popups
-VAstationselect_1$units <- dplyr::recode(VAstationselect_1$units,"DO"="mg/L","pH"="(unitless)","SpCond"="uS/cm","TP"="mg/L","TN"="mg/L","TotHab"="(unitless)",
+VAstationselect_1$units <- dplyr::recode(VAstationselect_1$units,"VSCI"="(unitless)","DO"="mg/L","pH"="(unitless)","SpCond"="uS/cm","TP"="mg/L","TN"="mg/L","TotHab"="(unitless)",
                                          "TDS_V"="mg/L","MetalCCU"="(unitless)","LRBS"="(unitless)","NA_V"="mg/L","K_V"="mg/L","Cl_V"="mg/L",
                                          "Sf_V"="mg/L")
   
