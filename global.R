@@ -136,7 +136,7 @@ metalsCCUcalcDF <- function(df){
   Zinc <- df$Zinc
   met <- data.frame(MetalsCCU=NA)
   for(i in 1:nrow(df)){
-    met[i,] <- metalsCCUcalc(df$Hardness[i],df$Arsenic[i],df$Chromium[i],df$Copper[i],df$Lead[i],df$Nickel[i],df$Zinc[i])
+    met[i,] <- format(metalsCCUcalc(df$Hardness[i],df$Arsenic[i],df$Chromium[i],df$Copper[i],df$Lead[i],df$Nickel[i],df$Zinc[i]),digits=4)
   }
   return(met)
   #return(list(df$Hardness,df$Arsenic,df$Chromium,df$Copper,df$Lead,df$Nickel,df$Zinc))

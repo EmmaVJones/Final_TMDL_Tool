@@ -1,0 +1,96 @@
+---
+title: "Benthic Stressor Analysis Report"
+output: html_document
+params:
+  table_userinput: 'NULL'
+  table_compositestats: 'NULL'
+  table_Togethersummary: 'NULL'
+  plot_pH: "NULL"
+  plot_DO: "NULL"
+  plot_TN: "NULL"
+  plot_TP: "NULL"
+  plot_TotalHabitat: "NULL"
+  plot_LRBS: "NULL"
+  plot_MetalsCCU: "NULL"
+  plot_SpCond: "NULL"
+  plot_TDS: "NULL"
+  plot_dSulfate: "NULL"
+  plot_dChloride: "NULL"
+  plot_dPotassium: "NULL"
+  plot_dSodium: "NULL"
+---
+### User Input Data
+```{r,echo=F}
+DT::datatable(params[['table_userinput']],rownames = F)
+```
+
+### Composite Statistics
+```{r,echo=F}
+DT::datatable(params[['table_compositestats']]#%>% 
+                #formatStyle("pH", backgroundColor = 
+                 #             styleInterval(c(0,6,9), c("gray","yellow","limegreen","yellow"))))
+,rownames = F)
+```
+
+### Individual Parameter Statistics
+```{r,echo=F}
+DT::datatable(params[['table_Togethersummary']],rownames = F,options=list(dom = 't',pageLength=nrow(params[['table_Togethersummary']])))
+```
+
+### Statewide CDF Plots
+```{r,echo=F}
+params[['plot_pH']]
+```
+
+```{r,echo=F}
+params[['plot_DO']]
+```
+
+
+```{r,echo=F}
+params[['plot_TN']]
+```
+
+```{r,echo=F}
+params[['plot_TP']]
+```
+
+```{r,echo=F}
+params[['plot_TotalHabitat']]
+```
+
+```{r,echo=F}
+params[['plot_LRBS']]
+```
+
+
+```{r,echo=F}
+params[['plot_MetalsCCU']]
+```
+
+
+```{r,echo=F}
+params[['plot_SpCond']]
+```
+
+
+```{r,echo=F}
+params[['plot_TDS']]
+```
+
+```{r,echo=F}
+params[['plot_dSulfate']]
+```
+
+```{r,echo=F}
+params[['plot_dChloride']]
+```
+
+
+```{r,echo=F}
+params[['plot_dPotassium']]
+```
+
+```{r,echo=F}
+params[['plot_dSodium']]
+```
