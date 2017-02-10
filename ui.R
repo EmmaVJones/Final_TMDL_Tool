@@ -100,9 +100,19 @@ shinyUI(fluidPage(theme="slate.css",
                                                                  back to this app or use it for additional analyses.')))))),
                              tabPanel("Data Summary",
                                       column(12,tabsetPanel(
-                                        tabPanel("Composite Table",br(),br(),h4('Composite Table'),DT::dataTableOutput('colors'),
+                                        tabPanel("Composite Table",br(),br(),
+                                                 h4('Composite Table'),helpText('You can export the table below as a .csv, .xlsx, or .pdf by clicking the corresponding
+                                                          button below. The Copy button copies all table data for you to put into any spreadsheet 
+                                                          program. If you want the color background formatting, you need to manually select the 
+                                                          table with your cursor to copy all associated formatting to a spreadsheet program.'),
+                                                 DT::dataTableOutput('colors'),
                                                  column(3,DT::dataTableOutput('riskTableInfo')),br(),br(),
-                                                 column(4,wellPanel(downloadButton('report','Generate Report')))),
+                                                 column(4,
+                                                        wellPanel(h4('Report Output:'),
+                                                                    helpText('Click below to save a .HTML version of all the tables and graphics associated with 
+                                                                             the input station. You can save this to a .pdf after initial HTML conversion 
+                                                                             (File -> Print -> Save as PDF).'),
+                                                   downloadButton('report','Generate Report')))),
                                         # pH Summary
                                         tabPanel("pH Summary",br(),br(),h4('pH Summary'),
                                                  DT::dataTableOutput('pHtable_Site'),

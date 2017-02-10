@@ -67,9 +67,9 @@ shinyServer(function(input, output, session) {
     datatable(stats(), extensions = 'Buttons', escape=F, rownames = F,
               options=list(dom='Bt',
                            buttons=list('copy',
-                                        list(extend='csv',filename='testcsv'),
-                                        list(extend='excel',filename='testexcel'),
-                                        list(extend='pdf',orientation='landscape',filename='testpdf')
+                                        list(extend='csv',filename=paste('CompositeTable_',Sys.Date(),sep='')),
+                                        list(extend='excel',filename=paste('CompositeTable_',Sys.Date(),sep='')),
+                                        list(extend='pdf',orientation='landscape',filename=paste('CompositeTable_',Sys.Date(),sep=''))
                            )))%>%
                              #list(extend='collection',
                              #buttons=c('csv','excel','pdf'),
