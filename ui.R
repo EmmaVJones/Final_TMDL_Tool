@@ -101,7 +101,8 @@ shinyUI(fluidPage(theme="slate.css",
                              tabPanel("Data Summary",
                                       column(12,tabsetPanel(
                                         tabPanel("Composite Table",br(),br(),h4('Composite Table'),DT::dataTableOutput('colors'),
-                                                 column(3,DT::dataTableOutput('riskTableInfo'))),
+                                                 column(3,DT::dataTableOutput('riskTableInfo')),br(),br(),
+                                                 column(4,wellPanel(downloadButton('report','Generate Report (.pdf)')))),
                                         # pH Summary
                                         tabPanel("pH Summary",br(),br(),h4('pH Summary'),
                                                  DT::dataTableOutput('pHtable_Site'),
