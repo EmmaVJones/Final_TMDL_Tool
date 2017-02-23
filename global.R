@@ -11,7 +11,7 @@ library(reshape2)
 # Local data locations
 VAstationselect <- readRDS('data/VAstationselect_final.RDS')
 dat4 <- readRDS('data/dat4_final.RDS')
-cdfdata <- readRDS('data/cdfdataFINAL.RDS')
+cdfdata <- readRDS('data/cdfdataFebruary2017update_Dmetalsnotupdated.RDS')
 template <- read.csv('data/templateGIS.csv')
 template_metals <- read.csv('data/template_metals.csv')
 metalsCDF <- readRDS('data/metalsCDF.RDS')
@@ -45,9 +45,9 @@ brksDNa <- c(0,7,10,20)
 clrsDNa <- c("gray","cornflowerblue","limegreen","yellow","red")
 
 # Risk table
-riskHightoLow <- c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')
-risk <- data.frame(Risk_Category=c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life'))
-brksrisk <- c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')
+riskHightoLow <- c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','No Probability of Stress to Aquatic Life')
+risk <- data.frame(Risk_Category=c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','No Probability of Stress to Aquatic Life'))
+brksrisk <- c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','No Probability of Stress to Aquatic Life')
 clrsrisk <- c("red","yellow","limegreen","cornflowerblue")
 
 # VLOOKUP (Excel function hack) by Julin Maloof
@@ -116,28 +116,38 @@ subFunction2 <- function(cdftable,userValue){
 }
 
 # Metals CCU Calculation
-metalsCCUcalc <- function(Hardness,Arsenic,Chromium,Copper,Lead,Nickel,Zinc){
-  ArStand <- 150
-  ChromStand <- (exp(0.819*(log(Hardness))+0.6848))*0.86
-  CoStand <- (exp(0.8545*(log(Hardness))-1.702))*0.96
-  LdStand <- (exp(1.273*(log(Hardness))-3.259))
-  NiStand <- (exp(0.846*(log(Hardness))-0.884))*0.997
-  ZnStand <- (exp(0.8473*(log(Hardness))+0.884))*0.986
-  return(sum(Arsenic/ArStand,Chromium/ChromStand,Copper/CoStand,Lead/LdStand,Nickel/NiStand,Zinc/ZnStand))
+metalsCCUcalc <- function(Hardness,Aluminum,Arsenic,Cadmium,Chromium,Copper,Lead,Nickel,Selenium,Zinc){
+  criteriaHardness <- ifelse(Hardness<25,25,ifelse(Hardness>400,400,Hardness))
+  AluminumEPAChronic <- Aluminum/150
+  ArsenicChronic <- Arsenic/150
+  CadmiumChronic <- Cadmium/(exp(0.7852*(log(criteriaHardness))-3.49))
+  ChromiumChronic <- Chromium/((exp(0.819*(log(criteriaHardness))+0.6848))*0.86)
+  CopperChronic <- Copper/((exp(0.8545*(log(criteriaHardness))-1.702))*0.96)
+  LeadChronic <- Lead/((exp(1.273*(log(criteriaHardness))-3.259)))
+  NickelChronic <- Nickel/((exp(0.846*(log(criteriaHardness))-0.884))*0.997)
+  SeleniumChronic <- Selenium/5
+  ZincChronic <- Zinc/((exp(0.8473*(log(criteriaHardness))+0.884))*0.986)
+  return(sum(AluminumEPAChronic,ArsenicChronic,CadmiumChronic,ChromiumChronic,CopperChronic,LeadChronic,
+             NickelChronic,SeleniumChronic,ZincChronic))
 }
+
 # Metals CCU Calculation for dataframes
 metalsCCUcalcDF <- function(df){
   Hardness <- df$Hardness
+  Aluminum <- df$Aluminum
   Arsenic <- df$Arsenic
+  Cadmium <- df$Cadmium
   Chromium <- df$Chromium
   Copper <- df$Copper
   Lead <- df$Lead
   Nickel <- df$Nickel 
+  Selenium <- df$Selenium
   Zinc <- df$Zinc
   met <- data.frame(MetalsCCU=NA)
   for(i in 1:nrow(df)){
-    met[i,] <- format(metalsCCUcalc(df$Hardness[i],df$Arsenic[i],df$Chromium[i],df$Copper[i],df$Lead[i],df$Nickel[i],df$Zinc[i]),digits=4)
+    met[i,] <- format(metalsCCUcalc(df$Hardness[i],df$Aluminum[i],df$Arsenic[i],df$Cadmium[i],
+                                    df$Chromium[i],df$Copper[i],df$Lead[i],df$Nickel[i],
+                                    df$Selenium[i],df$Zinc[i]),digits=4)
   }
   return(met)
-  #return(list(df$Hardness,df$Arsenic,df$Chromium,df$Copper,df$Lead,df$Nickel,df$Zinc))
 }

@@ -21,44 +21,44 @@ VAstationselect <- merge(VAstationselect,VAstationsselect1,by=c('sampleID','Long
 rm(VAstationsselect1)
 # Factor level work
 VAstationselect$DOfactor <- cut(VAstationselect$DO,c(0,7,8,10,20)
-                                ,labels=c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')) 
+                                ,labels=c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','No Probability of Stress to Aquatic Life')) 
 # trick it into level order needed for pal
-levels(VAstationselect$DOfactor) <- list('No Risk to Aquatic Life'='No Risk to Aquatic Life','Low Risk to Aquatic Life'='Low Risk to Aquatic Life','Medium Risk to Aquatic Life'='Medium Risk to Aquatic Life ','High Risk to Aquatic Life'='High Risk to Aquatic Life')
+levels(VAstationselect$DOfactor) <- list('No Probability of Stress to Aquatic Life'='No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life'='Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life'='Medium Probability of Stress to Aquatic Life ','High Probability of Stress to Aquatic Life'='High Probability of Stress to Aquatic Life')
 # trick it to have 4 levels for color pal purposes
 VAstationselect$pHfactor <- cut(VAstationselect$pH,c(-1,0,6,9,15,16)
-                                ,labels=rev(c('High Risk to Aquatic Life','Medium Risk to Aquatic Life (-)','Low Risk to Aquatic Life','Medium Risk to Aquatic Life (+)'
-                                              ,'No Risk to Aquatic Life'))) 
-levels(VAstationselect$pHfactor) <- list('No Risk to Aquatic Life'='No Risk to Aquatic Life','Low Risk to Aquatic Life'='Low Risk to Aquatic Life','Medium Risk to Aquatic Life'=c('Medium Risk to Aquatic Life (-)','Medium Risk to Aquatic Life (+)'),'High Risk to Aquatic Life'='High Risk to Aquatic Life')
+                                ,labels=rev(c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life (-)','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life (+)'
+                                              ,'No Probability of Stress to Aquatic Life'))) 
+levels(VAstationselect$pHfactor) <- list('No Probability of Stress to Aquatic Life'='No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life'='Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life'=c('Medium Probability of Stress to Aquatic Life (-)','Medium Probability of Stress to Aquatic Life (+)'),'High Probability of Stress to Aquatic Life'='High Probability of Stress to Aquatic Life')
 VAstationselect$SpCondfactor <- cut(VAstationselect$SpCond,c(0,250,350,500,4000)
-                                    ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                    ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$TPfactor <- cut(VAstationselect$TP,c(0,0.02,0.05,0.1,5)
-                                ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$TNfactor <- cut(VAstationselect$TN,c(0,0.5,1,2,100)
-                                ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$TotHabfactor <- cut(VAstationselect$TotHab,c(0,100,130,150,200)
-                                    ,labels=c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')) 
+                                    ,labels=c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','No Probability of Stress to Aquatic Life')) 
 # trick it into level order needed for pal
-levels(VAstationselect$TotHabfactor) <- list('No Risk to Aquatic Life'='No Risk to Aquatic Life','Low Risk to Aquatic Life'='Low Risk to Aquatic Life','Medium Risk to Aquatic Life'='Medium Risk to Aquatic Life ','High Risk to Aquatic Life'='High Risk to Aquatic Life')
+levels(VAstationselect$TotHabfactor) <- list('No Probability of Stress to Aquatic Life'='No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life'='Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life'='Medium Probability of Stress to Aquatic Life ','High Probability of Stress to Aquatic Life'='High Probability of Stress to Aquatic Life')
 
 VAstationselect$TDS_Vfactor <- cut(VAstationselect$TDS_V,c(0,100,250,350,50000)
-                                ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$MetalCCUfactor <- cut(VAstationselect$MetalCCU,c(0,0.75,1.5,2.0,50)
-                                   ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                   ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 # trick it to have 4 levels for color pal purposes
 VAstationselect$LRBSfactor <- cut(VAstationselect$LRBS,c(-20,-1.5,-1.0,-0.5,0.5,15)
-                                ,labels=rev(c('High Risk to Aquatic Life','Medium Risk to Aquatic Life (-)','Low Risk to Aquatic Life','Medium Risk to Aquatic Life (+)'
-                                              ,'No Risk to Aquatic Life'))) 
-levels(VAstationselect$LRBSfactor) <- list('No Risk to Aquatic Life'='No Risk to Aquatic Life','Low Risk to Aquatic Life'='Low Risk to Aquatic Life','Medium Risk to Aquatic Life'=c('Medium Risk to Aquatic Life (-)','Medium Risk to Aquatic Life (+)'),'High Risk to Aquatic Life'='High Risk to Aquatic Life')
+                                ,labels=rev(c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life (-)','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life (+)'
+                                              ,'No Probability of Stress to Aquatic Life'))) 
+levels(VAstationselect$LRBSfactor) <- list('No Probability of Stress to Aquatic Life'='No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life'='Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life'=c('Medium Probability of Stress to Aquatic Life (-)','Medium Probability of Stress to Aquatic Life (+)'),'High Probability of Stress to Aquatic Life'='High Probability of Stress to Aquatic Life')
 VAstationselect$NA_Vfactor <- cut(VAstationselect$NA_V,c(0,7,10,20,500)
-                                      ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                      ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$K_Vfactor <- cut(VAstationselect$K_V,c(0,1,2,10,500)
-                                  ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                  ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$Cl_Vfactor <- cut(VAstationselect$Cl_V,c(0,10,25,50,500)
-                                  ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                  ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$Sf_Vfactor <- cut(VAstationselect$Sf_V,c(0,10,25,75,500)
-                                  ,labels=c('No Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life','High Risk to Aquatic Life')) 
+                                  ,labels=c('No Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','High Probability of Stress to Aquatic Life')) 
 VAstationselect$VSCIfactor <- cut(VAstationselect$VSCIAll,c(0,42,60,72,115)
-                                  ,labels=c('High Risk to Aquatic Life','Medium Risk to Aquatic Life','Low Risk to Aquatic Life','No Risk to Aquatic Life')) 
+                                  ,labels=c('High Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','No Probability of Stress to Aquatic Life')) 
 
 
 # double check all factors came in correctly
@@ -66,7 +66,7 @@ str(VAstationselect)
 
 ## 2) work on palette colors for genaric factor levels
 # fake df with correct factor levels
-colOptions <- data.frame(stressLevels=as.factor(c("No Risk to Aquatic Life","Low Risk to Aquatic Life","Medium Risk to Aquatic Life","High Risk to Aquatic Life")))
+colOptions <- data.frame(stressLevels=as.factor(c("No Probability of Stress to Aquatic Life","Low Probability of Stress to Aquatic Life","Medium Probability of Stress to Aquatic Life","High Probability of Stress to Aquatic Life")))
 pal <- colorFactor(c("blue","limegreen","yellow","red"),levels=colOptions$stressLevels, ordered=T)
 
 parameterList <- as.factor(c('VSCIAll','DO','pH','SpCond','TP','TN','TotHab',"TDS_V","MetalCCU","LRBS","NA_V","K_V","Cl_V","Sf_V"))
@@ -119,7 +119,7 @@ datatable(DO) %>% formatStyle("DoProbe", backgroundColor = styleInterval(brks2, 
 
 
 # save CDF data with appropriate Indicator names
-cdfdata2 <- read.csv('data/cdfdataFINAL.csv')
+cdfdata2 <- read.csv('data/cdfdataFebruary2017update_Dmetalsnotupdated.csv')
 # Work up new Dissolved Metals data
 metalsCDF <- read_excel("data/DissMetalStatus.CDF.xlsx",sheet="biostatus.CDF")%>%
   select(-c(Type))%>%
@@ -127,15 +127,15 @@ metalsCDF <- read_excel("data/DissMetalStatus.CDF.xlsx",sheet="biostatus.CDF")%>
 cdfdata2 <- rbind(cdfdata2,metalsCDF)
 
 # Add units to cdfdata final
-cdfdata2 <- mutate(cdfdata,units=Indicator)
-cdfdata2$units <- dplyr::recode(cdfdata2$units,"DChloride"="mg/L","DO"="mg/L","DPotassium"="mg/L","DSodium"="mg/L","DSulfate"="mg/L",
+cdfdata2 <- mutate(cdfdata2,units=Indicator)
+cdfdata2$units <- dplyr::recode(cdfdata2$units,"VSCIAll"="(unitless)","DChloride"="mg/L","DO"="mg/L","DPotassium"="mg/L","DSodium"="mg/L","DSulfate"="mg/L",
                                 "LRBS"="(unitless)", "MetalsCCU"="(unitless)","pH"="(unitless)","SpCond"="uS/cm","TDS"="mg/L",
                                 "TN"="mg/L","TotalHabitat"="(unitless)","TP"="mg/L","ANTIMONY"="ug/L","ALUMINUM"="ug/L",
                                 "ARSENIC"="ug/L","BARIUM"="ug/L","BERY"="ug/L","CADMIUM"="ug/L","CALCUIM"="mg/L","CHROMIUM"="ug/L",
                                 "COPPER"="ug/L","IRON"="ug/L","LEAD"="ug/L","MAGN"="mg/L","MANGANESE"="ug/L","NICKEL"="ug/L",
                                 "SELENIUM"="ug/L","SILVER"="ug/L","THALLIUM"="ug/L","ZINC"="ug/L","HARDNESS"="mg/L")    
 cdfdata2$Indicator <- dplyr::recode(cdfdata2$Indicator,'CALCUIM'='CALCIUM','BERY'='BERYLLIUM','MAGN'='MAGNESIUM')
-saveRDS(cdfdata2,'data/cdfdataFINAL.RDS')                               
+saveRDS(cdfdata2,'data/cdfdataFebruary2017update_Dmetalsnotupdated.RDS')                               
 
 
 # Work up new Dissolved Metals data

@@ -5,7 +5,10 @@ params:
   table_userinput: 'NULL'
   table_compositestats: 'NULL'
   table_Togethersummary: 'NULL'
-  plot_pH: "NULL"
+  plot_pHVA: "NULL"
+  plot_pHB: "NULL"
+  plot_pHE: "NULL"
+  plot_pHO: "NULL"
   plot_DO: "NULL"
   plot_TN: "NULL"
   plot_TP: "NULL"
@@ -38,8 +41,9 @@ DT::datatable(params[['table_Togethersummary']],rownames = F,options=list(dom = 
 ```
 
 ### Statewide CDF Plots
-```{r,echo=F}
-params[['plot_pH']]
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_pHVA']],params[['plot_pHB']],params[['plot_pHE']],params[['plot_pHO']],
+                        ncol=2)
 ```
 
 ```{r,echo=F}

@@ -1,3 +1,5 @@
+source('global.R')
+
 # Upload GIS data here to avoid uploading it twice (if it were in the global.R file)
 eco2 <- readOGR('data/','vaECOREGIONlevel3__proj84')
 supaB2 <- readOGR('data/','VAsuperbasins_proj84')
@@ -47,9 +49,10 @@ shinyServer(function(input, output, session) {
  
   # Metals CCU Calculation
   mCCU <- reactive({
-    if(is.null(input$Hardness&input$Arsenic&input$Chromium&input$Copper&input$Lead&input$Nickel&input$Zinc))
+    if(is.null(input$Hardness))
       return(NULL)
-    return(format(metalsCCUcalc(input$Hardness,input$Arsenic,input$Chromium,input$Copper,input$Lead,input$Nickel,input$Zinc),digits=4))
+    return(format(metalsCCUcalc(input$Hardness,input$Aluminum,input$Arsenic,input$Cadmium,input$Chromium,input$Copper,
+                                input$Lead,input$Nickel,input$Selenium,input$Zinc),digits=4))
   })
   
   output$metalsTable <- renderDataTable({
@@ -89,50 +92,7 @@ shinyServer(function(input, output, session) {
       formatStyle("DPotassium", backgroundColor = styleInterval(brksDK, clrsDK))%>%
       formatStyle("DSodium", backgroundColor = styleInterval(brksDNa, clrsDNa))
     }, digits=4,border=TRUE)
-  
-  # Try outputting html report
-  output$report <- downloadHandler(
-    "results.html",
-    content= function(file){
-      tempReport <- file.path(tempdir(),"reportHTML.Rmd")
-      file.copy("reportHTML.Rmd",tempReport,overwrite = T)
-      params <- list(table_userinput=inputFile(),table_compositestats=stats(),
-                     table_Togethersummary=percentilesTogether(),
-                     plot_pH=p_pH_(),plot_DO=p_DO_(),plot_TN=p_TN_(),plot_TP=p_TP_(),
-                     plot_TotalHabitat=p_TotalHabitat_(),plot_LRBS=p_LRBS_(),plot_MetalsCCU=p_MetalsCCU_(),
-                     plot_SpCond=p_SpCond_(),plot_TDS=p_TDS_(),plot_dSulfate=p_DSulfate_(),
-                     plot_dChloride=p_DChloride_(),plot_dPotassium=p_DPotassium_(),
-                     plot_dSodium=p_DSodium_())
-      
-      rmarkdown::render(tempReport,output_file = file,
-                        params=params,envir=new.env(parent = globalenv()))
-    }
-  )
-  
-  
-  
-  
-  
-  # Try outputting Rmarkdown report
-  #output$report <- downloadHandler(
-  #  "results.pdf",
-  #  content= function(file){
-  #    rmarkdown::render(
-  #      input="report.Rmd",
-  #      output_format=#pdf_document(latex_engine='xelatex'),
-  #      output_file="built_report.pdf",
-  #      params=list(table=stats()))
-  #    readBin(con="built_report.pdf",
-  #            what="raw",
-  #            n=file.info("built_report.pdf")[,"size"])%>%
-  #      writeBin(con=file)
-  #  }
-  #)
-    
 
-  
-  
-  
   # Output Colored Risk datatable
   output$riskTableInfo <- DT::renderDataTable({
     datatable(risk,colnames=c('Risk Category'),rownames=FALSE) %>% 
@@ -219,43 +179,40 @@ shinyServer(function(input, output, session) {
       formatStyle(c("Average","Median"), backgroundColor = styleInterval(brkspH, clrspH))})
   output$pHtable <- DT::renderDataTable({datatable(percentilespH()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTablepH <- DT::renderDataTable({
-    datatable(data.frame(Risk_Category=c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life','Medium Risk to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
+    datatable(data.frame(Risk_Category=c('Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
               colnames=c('Risk Category','pH (unitless)'),rownames = F) %>%#,options=list(columnDefs=list(list(targets=3,visible=F)))
-      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c('Medium Risk to Aquatic Life','Low Risk to Aquatic Life'),c('yellow','limegreen')))})
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c('Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life'),c('yellow','limegreen')))})
   output$pHdataset <- renderUI({
     selectInput("pHdataset_","Select Dataset to Plot",percentilespH()$Statistic[2:5])
   })
   output$pHplot_ <- renderUI({
     plotOutput("p_pH")
   })
+  
+
+  cdfplot <- function(parameter,indicator,dataset){
+    cdfsubset <- subFunction(cdfdata,parameter,indicator)
+    avg1 <- as.numeric(filter(dataset,Statistic==indicator)[,2])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(filter(dataset,Statistic==indicator)[,3]) 
+    med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + 
+      labs(x=paste(parameter,unique(cdfsubset$units),sep=" "),y="Percentile") +
+      ggtitle(paste(indicator,parameter,"Percentile Graph (n= ",m,")",sep=" ")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))+
+      geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    return(p1)
+  }
+  
   output$p_pH <- renderPlot({
     if(is.null(input$pHdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"pH",input$pHdataset_)
-    avg1 <- as.numeric(subset(percentilespH(),Statistic==input$pHdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilespH(),Statistic==input$pHdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="pH (unitless)",y="Percentile") +
-      ggtitle(paste(input$pHdataset_," pH Percentile Graph",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('pH',input$pHdataset_,percentilespH())
   })
-  p_pH_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"pH","Virginia")
-    avg1 <- as.numeric(subset(percentilespH(),Statistic==input$pHdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilespH(),Statistic==input$pHdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="pH (unitless)",y="Percentile") +
-      ggtitle("Statewide pH Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
 
   # Dissolved Oxygen Summary Page
   output$DOtable_Site <- DT::renderDataTable({datatable(percentilesDO()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -278,27 +235,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DOdataset_," Dissolved Oxygen Percentile Graph",sep="")) + 
+      ggtitle(paste(input$DOdataset_," Dissolved Oxygen Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_DO_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"DO","Virginia")
-    avg1 <- as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile") +
-      ggtitle("Statewide Dissolved Oxygen Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
-  
+
   # Total Nitrogen Summary Page
   output$TNtable_Site <- DT::renderDataTable({datatable(percentilesTN()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
       formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTN, clrsTN))})
@@ -320,26 +265,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesTN(),Statistic==input$TNdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Nitrogen (mg/L)",y="Percentile") +
-      ggtitle(paste(input$TNdataset_," Total Nitrogen Percentile Graph",sep="")) + 
+      ggtitle(paste(input$TNdataset_," Total Nitrogen Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_TN_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"TN","Virginia")
-    avg1 <- as.numeric(subset(percentilesTN(),Statistic==input$TNdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTN(),Statistic==input$TNdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Nitrogen (mg/L)",y="Percentile") +
-      ggtitle("Virginia Total Nitrogen Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
   # Total Phosphorus Summary Page
   output$TPtable_Site <- DT::renderDataTable({datatable(percentilesTP()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -362,26 +296,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesTP(),Statistic==input$TPdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Phosphorus (mg/L)",y="Percentile") +
-      ggtitle(paste(input$TPdataset_," Total Phosphorus Percentile Graph",sep="")) + 
+      ggtitle(paste(input$TPdataset_," Total Phosphorus Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_TP_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"TP","Virginia")
-    avg1 <- as.numeric(subset(percentilesTP(),Statistic==input$TPdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTP(),Statistic==input$TPdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Phosphorus (mg/L)",y="Percentile") +
-      ggtitle("Statewide Total Phosphorus Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
  
   # Total Habitat Summary Page
@@ -405,34 +328,23 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesTotalHabitat(),Statistic==input$TotalHabitatdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Habitat (unitless)",y="Percentile") +
-      ggtitle(paste(input$TotalHabitatdataset_," Total Habitat Percentile Graph",sep="")) + 
+      ggtitle(paste(input$TotalHabitatdataset_," Total Habitat Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_TotalHabitat_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"TotalHabitat","Virginia")
-    avg1 <- as.numeric(subset(percentilesTotalHabitat(),Statistic==input$TotalHabitatdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTotalHabitat(),Statistic==input$TotalHabitatdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Habitat (unitless)",y="Percentile") +
-      ggtitle("Statewide Total Habitat Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
   # LRBS Summary Page
   output$LRBStable_Site <- DT::renderDataTable({datatable(percentilesLRBS()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
       formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksLRBS, clrsLRBS))})
   output$LRBStable <- DT::renderDataTable({datatable(percentilesLRBS()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
   output$riskTableLRBS <- DT::renderDataTable({
-    datatable(cbind(rbind(risk,'Medium Risk to Aquatic Life'),LRBS=c('< -1.5','> -1.5, < -1.0','> -0.5, < -1.0','> -0.5, < 0.5','> 0.5')),colnames=c('Risk Category','Relative Bed Stability (unitless)'),rownames = F)%>%
-      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c(riskHightoLow,'Medium Risk to Aquatic Life'),clrsLRBS[2:6]))})
+    datatable(cbind(rbind(risk,'Medium Probability of Stress to Aquatic Life'),LRBS=c('< -1.5','> -1.5, < -1.0','> -0.5, < -1.0','> -0.5, < 0.5','> 0.5')),colnames=c('Risk Category','Relative Bed Stability (unitless)'),rownames = F)%>%
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c(riskHightoLow,'Medium Probability of Stress to Aquatic Life'),clrsLRBS[2:6]))})
   output$LRBSdataset <- renderUI({
     selectInput("LRBSdataset_","Select Dataset to Plot",percentilesLRBS()$Statistic[2:5])
   })
@@ -447,26 +359,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesLRBS(),Statistic==input$LRBSdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="LRBS (unitless)",y="Percentile") +
-      ggtitle(paste(input$LRBSdataset_," LRBS Percentile Graph",sep="")) + 
+      ggtitle(paste(input$LRBSdataset_," LRBS Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_LRBS_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"LRBS","Virginia")
-    avg1 <- as.numeric(subset(percentilesLRBS(),Statistic==input$LRBSdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesLRBS(),Statistic==input$LRBSdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="LRBS (unitless)",y="Percentile") +
-      ggtitle("Statewise LRBS Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
   # Metals CCU Summary Page
   output$MetalsCCUtable_Site <- DT::renderDataTable({datatable(percentilesMetalsCCU()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
@@ -489,26 +390,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesMetalsCCU(),Statistic==input$MetalsCCUdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Metals CCU (unitless)",y="Percentile") +
-      ggtitle(paste(input$MetalsCCUdataset_," Metals CCU Percentile Graph",sep="")) + 
+      ggtitle(paste(input$MetalsCCUdataset_," Metals CCU Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_MetalsCCU_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"MetalsCCU","Virginia")
-    avg1 <- as.numeric(subset(percentilesMetalsCCU(),Statistic==input$MetalsCCUdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesMetalsCCU(),Statistic==input$MetalsCCUdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Metals CCU (unitless)",y="Percentile") +
-      ggtitle("Statewide Metals CCU Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
   # Specific Conductivity Summary Page
   output$SpCondtable_Site <- DT::renderDataTable({datatable(percentilesSpCond()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
@@ -531,26 +421,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesSpCond(),Statistic==input$SpConddataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Specific Conductivity (uS/cm)",y="Percentile") +
-      ggtitle(paste(input$SpConddataset_," Specific Conductivity Percentile Graph",sep="")) + 
+      ggtitle(paste(input$SpConddataset_," Specific Conductivity Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_SpCond_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"SpCond","Virginia")
-    avg1 <- as.numeric(subset(percentilesSpCond(),Statistic==input$SpConddataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesSpCond(),Statistic==input$SpConddataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Specific Conductivity (uS/cm)",y="Percentile") +
-      ggtitle("Statewide Specific Conductivity Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
    
   # TDS Summary Page
   output$TDStable_Site <- DT::renderDataTable({datatable(percentilesTDS()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -573,26 +452,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesTDS(),Statistic==input$TDSdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Dissolved Solids (mg/L)",y="Percentile") +
-      ggtitle(paste(input$TDSdataset_," Total Dissolved Solids Percentile Graph",sep="")) + 
+      ggtitle(paste(input$TDSdataset_," Total Dissolved Solids Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_TDS_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"TDS","Virginia")
-    avg1 <- as.numeric(subset(percentilesTDS(),Statistic==input$TDSdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTDS(),Statistic==input$TDSdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Dissolved Solids (mg/L)",y="Percentile") +
-      ggtitle("Statewide Total Dissolved Solids Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
   # Dissolved Sulfate Summary Page
   output$DSulfatetable_Site <- DT::renderDataTable({datatable(percentilesDSulfate()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -615,26 +483,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesDSulfate(),Statistic==input$DSulfatedataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sulfate (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DSulfatedataset_," Dissolved Sulfate Percentile Graph",sep="")) + 
+      ggtitle(paste(input$DSulfatedataset_," Dissolved Sulfate Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_DSulfate_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"DSulfate","Virginia")
-    avg1 <- as.numeric(subset(percentilesDSulfate(),Statistic==input$DSulfatedataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDSulfate(),Statistic==input$DSulfatedataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sulfate (mg/L)",y="Percentile") +
-      ggtitle("Statewide Dissolved Sulfate Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
   # Dissolved Chloride Summary Page
   output$DChloridetable_Site <- DT::renderDataTable({datatable(percentilesDChloride()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -657,26 +514,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesDChloride(),Statistic==input$DChloridedataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Chloride (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DChloridedataset_," Dissolved Chloride Percentile Graph",sep="")) + 
+      ggtitle(paste(input$DChloridedataset_," Dissolved Chloride Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_DChloride_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"DChloride","Virginia")
-    avg1 <- as.numeric(subset(percentilesDChloride(),Statistic==input$DChloridedataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDChloride(),Statistic==input$DChloridedataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Chloride (mg/L)",y="Percentile") +
-      ggtitle("Statewide Dissolved Chloride Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+
   
   # Dissolved Potassium Summary Page
   output$DPotassiumtable_Site <- DT::renderDataTable({datatable(percentilesDPotassium()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -699,26 +545,15 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesDPotassium(),Statistic==input$DPotassiumdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Potassium (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DPotassiumdataset_," Dissolved Potassium Percentile Graph",sep="")) + 
+      ggtitle(paste(input$DPotassiumdataset_," Dissolved Potassium Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-  p_DPotassium_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"DPotassium","Virginia")
-    avg1 <- as.numeric(subset(percentilesDPotassium(),Statistic==input$DPotassiumdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDPotassium(),Statistic==input$DPotassiumdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Potassium (mg/L)",y="Percentile") +
-      ggtitle("Statewide Dissolved Potassium Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+ 
   
   
   
@@ -743,29 +578,18 @@ shinyServer(function(input, output, session) {
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(subset(percentilesDSodium(),Statistic==input$DSodiumdataset_)[3])
     med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sodium (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DSodiumdataset_," Dissolved Sodium Percentile Graph",sep="")) + 
+      ggtitle(paste(input$DSodiumdataset_," Dissolved Sodium Percentile Graph (n= ",m," )",sep="")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
       theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   }) # have to make separately or cannot send to Rmarkdown report
-  p_DSodium_ <- reactive({
-    cdfsubset <- subFunction(cdfdata,"DSodium","Virginia")
-    avg1 <- as.numeric(subset(percentilesDSodium(),Statistic==input$DSodiumdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDSodium(),Statistic==input$DSodiumdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sodium (mg/L)",y="Percentile") +
-      ggtitle("Statewide Dissolved Sodium Percentile Graph") + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  })
+  
   
   ## Map
-  colOptions <- data.frame(stressLevels=as.factor(c("No Risk to Aquatic Life","Low Risk to Aquatic Life","Medium Risk to Aquatic Life","High Risk to Aquatic Life")))
+  colOptions <- data.frame(stressLevels=as.factor(c("No Probability of Stress to Aquatic Life","Low Probability of Stress to Aquatic Life","Medium Probability of Stress to Aquatic Life","High Probability of Stress to Aquatic Life")))
   pal <- colorFactor(c("blue","limegreen","yellow","red"),levels=colOptions$stressLevels, ordered=T)
   # First interpret user selection to enable filtering)
   dataSelect <- reactive({switch(input$parameterToPlot
@@ -776,7 +600,7 @@ shinyServer(function(input, output, session) {
                                  ,'Metals CCU'='MetalCCUfactor','LRBS'='LRBSfactor','Dissolved Sodium'='NA_Vfactor'
                                  ,'Dissolved Potassium'='K_Vfactor','Dissolved Chloride'='Cl_Vfactor','Dissolved Sulfate'='Sf_Vfactor')})
   dataSelectcdf <- reactive({switch(input$parameterToPlot
-                                    ,'Dissolved Oxygen'='DO','pH'='pH','Specific Conductivity'='SpCond'
+                                    ,'VSCI'='VSCIAll','Dissolved Oxygen'='DO','pH'='pH','Specific Conductivity'='SpCond'
                                     ,'Total Phosphorus'='TP','Total Nitrogen'='TN','Total Habitat'='TotalHabitat'
                                     ,'LRBS'='LRBS','Metals CCU'='MetalsCCU','Total Dissolved Solids'='TDS'
                                     ,'Dissolved Sulfate'='DSulfate','Dissolved Chloride'='DChloride'
@@ -851,14 +675,13 @@ shinyServer(function(input, output, session) {
     df <- subset(cdfdata,Indicator==dataSelectcdf() & Subpopulation=="Virginia")})
   
   output$Statewidecdf <- renderPlot({if(input$showcdf==T){
-    if(input$parameterToPlot!='VSCI'){
       p <- ggplot(filteredDatacdf(), aes(Value,Estimate.P))+
         labs(list(title=paste("Statewide",input$parameterToPlot,"\nPercentile Graph")
                   ,x=paste(input$parameterToPlot,filteredDatacdf()$units,sep=" ")
                   ,y='Statewide Percentile'))
       p+geom_point()+geom_line(aes(y=LCB95Pct.P),colour='gray')+
         geom_line(aes(y=UCB95Pct.P),colour='gray')
-      }}})
+      }})
   
   
   
@@ -969,19 +792,84 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=pct,color='orange',size=4)
     
   },height = 250,width=325)
- 
-  # In case need to test cdf output
+  
+  ####--------------------------------------- RMARKDOWN SECTION--------------------------------------------------
+  # Try outputting html report
+  output$report <- downloadHandler(
+    "results.html",
+    content= function(file){
+      tempReport <- file.path(tempdir(),"reportHTML.Rmd")
+      file.copy("reportHTML.Rmd",tempReport,overwrite = T)
+      params <- list(table_userinput=inputFile(),table_compositestats=stats(),
+                     table_Togethersummary=percentilesTogether(),
+                     plot_pHVA=p_pH_VA(),plot_pHB=p_pH_B(),plot_pHE=p_pH_E(),plot_pHO=p_pH_O())
+      
+      rmarkdown::render(tempReport,output_file = file,
+                        params=params,envir=new.env(parent = globalenv()))
+    }
+  )
   
   
-  #output$test <- renderTable({
-  #  if(is.null(inputFile_metals))
-  #    return(NULL)
-  #  parametercap <- toupper(input$dMetal_)
-  #  cdfsubset <- subFunction(cdfdata,parametercap,"Virginia")
-  #  pct1 <- mutate(percentilesDissolvedMetals(),metal=sub(" .*","",final$Dissolved_Metal))%>%
-  #    filter(metal==input$dMetal_)
-  #  pct <- subFunction2(cdfsubset,pct1[,3])
-  #  return(pct[,3:8])
-  #})
   
+  
+  
+  # Try outputting Rmarkdown report
+  #output$report <- downloadHandler(
+  #  "results.pdf",
+  #  content= function(file){
+  #    rmarkdown::render(
+  #      input="report.Rmd",
+  #      output_format=#pdf_document(latex_engine='xelatex'),
+  #      output_file="built_report.pdf",
+  #      params=list(table=stats()))
+  #    readBin(con="built_report.pdf",
+  #            what="raw",
+  #            n=file.info("built_report.pdf")[,"size"])%>%
+  #      writeBin(con=file)
+  #  }
+  #)
+  
+  
+  
+  
+  
+  # CDF plot function for RMD output
+  cdfRMDplot <- function(parameter,indicator){
+    cdfsubset <- subFunction(cdfdata,parameter,indicator)
+    avg1 <- as.numeric(filter(percentilesTogether(),Parameter==parameter & Statistic==indicator)[,3])
+    avg <- subFunction2(cdfsubset,avg1)
+    med1 <- as.numeric(filter(percentilesTogether(),Parameter==parameter & Statistic==indicator)[,4]) 
+    med <- subFunction2(cdfsubset,med1)
+    m <- max(cdfsubset$NResp)
+    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + 
+      labs(x=paste(parameter,unique(cdfsubset$units),sep=" "),y="Percentile") +
+      ggtitle(paste(indicator,parameter,"Percentile Graph (n= ",m,")",sep=" ")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))+
+      geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
+      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    return(p1)
+  }
+  p_pH_VA <- reactive({cdfRMDplot('pH','Virginia')})
+  p_pH_B <- reactive({cdfRMDplot('pH',input$Basin)})
+  p_pH_E <- reactive({cdfRMDplot('pH',input$Ecoregion)})
+  p_pH_O <- reactive({cdfRMDplot('pH',input$StreamOrder)})
+  
+  
+
 })
+# In case need to test cdf output
+
+
+#output$test <- renderTable({
+#  if(is.null(inputFile_metals))
+#    return(NULL)
+#  parametercap <- toupper(input$dMetal_)
+#  cdfsubset <- subFunction(cdfdata,parametercap,"Virginia")
+#  pct1 <- mutate(percentilesDissolvedMetals(),metal=sub(" .*","",final$Dissolved_Metal))%>%
+#    filter(metal==input$dMetal_)
+#  pct <- subFunction2(cdfsubset,pct1[,3])
+#  return(pct[,3:8])
+#})
+
+
