@@ -9,18 +9,54 @@ params:
   plot_pHB: "NULL"
   plot_pHE: "NULL"
   plot_pHO: "NULL"
-  plot_DO: "NULL"
-  plot_TN: "NULL"
-  plot_TP: "NULL"
-  plot_TotalHabitat: "NULL"
-  plot_LRBS: "NULL"
-  plot_MetalsCCU: "NULL"
-  plot_SpCond: "NULL"
-  plot_TDS: "NULL"
-  plot_dSulfate: "NULL"
-  plot_dChloride: "NULL"
-  plot_dPotassium: "NULL"
-  plot_dSodium: "NULL"
+  plot_DOVA: "NULL"
+  plot_DOB: "NULL"
+  plot_DOE: "NULL"
+  plot_DOO: "NULL"
+  plot_TNVA: "NULL"
+  plot_TNB: "NULL"
+  plot_TNE: "NULL"
+  plot_TNO: "NULL"
+  plot_TPVA: "NULL"
+  plot_TPB: "NULL"
+  plot_TPE: "NULL"
+  plot_TPO: "NULL"
+  plot_TotalHabitatVA: "NULL"
+  plot_TotalHabitatB: "NULL"
+  plot_TotalHabitatE: "NULL"
+  plot_TotalHabitatO: "NULL"
+  plot_LRBSVA: "NULL"
+  plot_LRBSB: "NULL"
+  plot_LRBSE: "NULL"
+  plot_LRBSO: "NULL"
+  plot_MetalsCCUVA: "NULL"
+  plot_MetalsCCUB: "NULL"
+  plot_MetalsCCUE: "NULL"
+  plot_MetalsCCUO: "NULL"
+  plot_SpCondVA: "NULL"
+  plot_SpCondB: "NULL"
+  plot_SpCondE: "NULL"
+  plot_SpCondO: "NULL"
+  plot_TDSVA: "NULL"
+  plot_TDSB: "NULL"
+  plot_TDSE: "NULL"
+  plot_TDSO: "NULL"
+  plot_DSulfateVA: "NULL"
+  plot_DSulfateB: "NULL"
+  plot_DSulfateE: "NULL"
+  plot_DSulfateO: "NULL"
+  plot_DChlorideVA: "NULL"
+  plot_DChlorideB: "NULL"
+  plot_DChlorideE: "NULL"
+  plot_DChlorideO: "NULL"
+  plot_DPotassiumVA: "NULL"
+  plot_DPotassiumB: "NULL"
+  plot_DPotassiumE: "NULL"
+  plot_DPotassiumO: "NULL"
+  plot_DSodiumVA: "NULL"
+  plot_DSodiumB: "NULL"
+  plot_DSodiumE: "NULL"
+  plot_DSodiumO: "NULL"
 ---
 ### User Input Data
 ```{r,echo=F}
@@ -46,55 +82,64 @@ gridExtra::grid.arrange(params[['plot_pHVA']],params[['plot_pHB']],params[['plot
                         ncol=2)
 ```
 
-```{r,echo=F}
-params[['plot_DO']]
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_pHVA']],params[['plot_pHB']],params[['plot_pHE']],params[['plot_pHO']],
+                        ncol=2)
+```
+
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_DOVA']],params[['plot_DOB']],params[['plot_DOE']],params[['plot_DOO']],
+                        ncol=2)
+```
+
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_TNVA']],params[['plot_TNB']],params[['plot_TNE']],params[['plot_TNO']],
+                        ncol=2)
+```
+
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_TPVA']],params[['plot_TPB']],params[['plot_TPE']],params[['plot_TPO']],
+                        ncol=2)
+```
+
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_TotalHabitatVA']],params[['plot_TotalHabitatB']],params[['plot_TotalHabitatE']],params[['plot_TotalHabitatO']],ncol=2)
+```
+
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_LRBSVA']],params[['plot_LRBSB']],params[['plot_LRBSE']],params[['plot_LRBSO']],ncol=2)
+```
+
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_MetalsCCUVA']],params[['plot_MetalsCCUB']],params[['plot_MetalsCCUE']],params[['plot_MetalsCCUO']],ncol=2)
 ```
 
 
-```{r,echo=F}
-params[['plot_TN']]
-```
-
-```{r,echo=F}
-params[['plot_TP']]
-```
-
-```{r,echo=F}
-params[['plot_TotalHabitat']]
-```
-
-```{r,echo=F}
-params[['plot_LRBS']]
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_SpCondVA']],params[['plot_SpCondB']],params[['plot_SpCondE']],params[['plot_SpCondO']],ncol=2)
 ```
 
 
-```{r,echo=F}
-params[['plot_MetalsCCU']]
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_TDSVA']],params[['plot_TDSB']],params[['plot_TDSE']],params[['plot_TDSO']],ncol=2)
 ```
 
 
-```{r,echo=F}
-params[['plot_SpCond']]
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_DSulfateVA']],params[['plot_DSulfateB']],params[['plot_DSulfateE']],params[['plot_DSulfateO']],ncol=2)
 ```
 
 
-```{r,echo=F}
-params[['plot_TDS']]
-```
-
-```{r,echo=F}
-params[['plot_dSulfate']]
-```
-
-```{r,echo=F}
-params[['plot_dChloride']]
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_DChlorideVA']],params[['plot_DChlorideB']],params[['plot_DChlorideE']],params[['plot_DChlorideO']],ncol=2)
 ```
 
 
-```{r,echo=F}
-params[['plot_dPotassium']]
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_DPotassiumVA']],params[['plot_DPotassiumB']],params[['plot_DPotassiumE']],params[['plot_DPotassiumO']],ncol=2)
 ```
 
-```{r,echo=F}
-params[['plot_dSodium']]
+
+```{r,echo=F,fig.height=10,fig.width=12}
+gridExtra::grid.arrange(params[['plot_DSodiumVA']],params[['plot_DSodiumB']],params[['plot_DSodiumE']],params[['plot_DSodiumO']],ncol=2)
 ```

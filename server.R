@@ -38,15 +38,15 @@ shinyServer(function(input, output, session) {
     data_GIS <- reshape2::melt(stats(),c("Statistic"))%>%
       dcast(variable~Statistic)%>%
       mutate(StationID=unique(inputFile()$StationID),
-                       Longitude=unique(inputFile()$Longitude),
-                       Latitude=unique(inputFile()$Latitude))
+             Longitude=unique(inputFile()$Longitude),
+             Latitude=unique(inputFile()$Latitude))
     return(data_GIS)
     # dont know why I need to run all this extra code, debug later
   })
   
   output$summaryStats <- renderTable(stats())
- 
- 
+  
+  
   # Metals CCU Calculation
   mCCU <- reactive({
     if(is.null(input$Hardness))
@@ -74,10 +74,10 @@ shinyServer(function(input, output, session) {
                                         list(extend='excel',filename=paste('CompositeTable_',Sys.Date(),sep='')),
                                         list(extend='pdf',orientation='landscape',filename=paste('CompositeTable_',Sys.Date(),sep=''))
                            )))%>%
-                             #list(extend='collection',
-                             #buttons=c('csv','excel','pdf'),
-                             #text='Download'))
-  #))
+      #list(extend='collection',
+      #buttons=c('csv','excel','pdf'),
+      #text='Download'))
+      #))
       formatStyle("pH", backgroundColor = styleInterval(brkspH, clrspH))%>%
       formatStyle("DO", backgroundColor = styleInterval(brksDO, clrsDO)) %>%
       formatStyle("TN", backgroundColor = styleInterval(brksTN, clrsTN))%>%
@@ -91,8 +91,8 @@ shinyServer(function(input, output, session) {
       formatStyle("DChloride", backgroundColor = styleInterval(brksDChl, clrsDChl))%>%
       formatStyle("DPotassium", backgroundColor = styleInterval(brksDK, clrsDK))%>%
       formatStyle("DSodium", backgroundColor = styleInterval(brksDNa, clrsDNa))
-    }, digits=4,border=TRUE)
-
+  }, digits=4,border=TRUE)
+  
   # Output Colored Risk datatable
   output$riskTableInfo <- DT::renderDataTable({
     datatable(risk,colnames=c('Risk Category'),rownames=FALSE) %>% 
@@ -106,10 +106,10 @@ shinyServer(function(input, output, session) {
     return(percentileTable(stats(),"pH",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
   })
   percentilesDO <- reactive({
-  if(is.null(stats()))
-    return(NULL)
-  return(percentileTable(stats(),"DO",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
-    })
+    if(is.null(stats()))
+      return(NULL)
+    return(percentileTable(stats(),"DO",input$Basin,input$Ecoregion,input$StreamOrder,unique(inputFile()$StationID)))
+  })
   percentilesTN <- reactive({
     if(is.null(stats()))
       return(NULL)
@@ -169,27 +169,12 @@ shinyServer(function(input, output, session) {
     if(is.null(stats()))
       return(NULL)
     return(rbind(cbind(Parameter='pH',percentilespH()),cbind(Parameter='DO',percentilesDO()),cbind(Parameter='TN',percentilesTN()),cbind(Parameter='TP',percentilesTP()),cbind(Parameter='Total Habitat',percentilesTotalHabitat()),
-                      cbind(Parameter='LRBS',percentilesLRBS()),cbind(Parameter='Metals CCU',percentilesMetalsCCU()),cbind(Parameter='Specific Conductivity',percentilesSpCond()),cbind(Parameter='Total Dissolved Solids',percentilesTDS()),cbind(Parameter='Dissolved Sulfate',percentilesDSulfate()),
-                      cbind(Parameter='Dissolved Chloride',percentilesDChloride()),cbind(Parameter='Dissolved Potassium',percentilesDPotassium()),cbind(Parameter='Dissolved Sodium',percentilesDSodium())))
-      
-  })
-
-  # pH Summary Page   
-  output$pHtable_Site <- DT::renderDataTable({datatable(percentilespH()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
-      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brkspH, clrspH))})
-  output$pHtable <- DT::renderDataTable({datatable(percentilespH()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
-  output$riskTablepH <- DT::renderDataTable({
-    datatable(data.frame(Risk_Category=c('Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
-              colnames=c('Risk Category','pH (unitless)'),rownames = F) %>%#,options=list(columnDefs=list(list(targets=3,visible=F)))
-      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c('Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life'),c('yellow','limegreen')))})
-  output$pHdataset <- renderUI({
-    selectInput("pHdataset_","Select Dataset to Plot",percentilespH()$Statistic[2:5])
-  })
-  output$pHplot_ <- renderUI({
-    plotOutput("p_pH")
+                 cbind(Parameter='LRBS',percentilesLRBS()),cbind(Parameter='Metals CCU',percentilesMetalsCCU()),cbind(Parameter='Specific Conductivity',percentilesSpCond()),cbind(Parameter='Total Dissolved Solids',percentilesTDS()),cbind(Parameter='Dissolved Sulfate',percentilesDSulfate()),
+                 cbind(Parameter='Dissolved Chloride',percentilesDChloride()),cbind(Parameter='Dissolved Potassium',percentilesDPotassium()),cbind(Parameter='Dissolved Sodium',percentilesDSodium())))
+    
   })
   
-
+  # CDF plot function
   cdfplot <- function(parameter,indicator,dataset){
     cdfsubset <- subFunction(cdfdata,parameter,indicator)
     avg1 <- as.numeric(filter(dataset,Statistic==indicator)[,2])
@@ -207,13 +192,29 @@ shinyServer(function(input, output, session) {
     return(p1)
   }
   
+  
+  
+  # pH Summary Page   
+  output$pHtable_Site <- DT::renderDataTable({datatable(percentilespH()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
+      formatStyle(c("Average","Median"), backgroundColor = styleInterval(brkspH, clrspH))})
+  output$pHtable <- DT::renderDataTable({datatable(percentilespH()[2:5,],colnames=c('Subpopulation','Average Percentile','Median Percentile'),rowname=F)})
+  output$riskTablepH <- DT::renderDataTable({
+    datatable(data.frame(Risk_Category=c('Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life','Medium Probability of Stress to Aquatic Life'),pH=c("< 6","6 - 9","> 9")),
+              colnames=c('Risk Category','pH (unitless)'),rownames = F) %>%#,options=list(columnDefs=list(list(targets=3,visible=F)))
+      formatStyle('Risk_Category',target='row',backgroundColor=styleEqual(c('Medium Probability of Stress to Aquatic Life','Low Probability of Stress to Aquatic Life'),c('yellow','limegreen')))})
+  output$pHdataset <- renderUI({
+    selectInput("pHdataset_","Select Dataset to Plot",percentilespH()$Statistic[2:5])
+  })
+  output$pHplot_ <- renderUI({
+    plotOutput("p_pH")
+  })
   output$p_pH <- renderPlot({
     if(is.null(input$pHdataset_))
       return(NULL)
     cdfplot('pH',input$pHdataset_,percentilespH())
   })
-
-
+  
+  
   # Dissolved Oxygen Summary Page
   output$DOtable_Site <- DT::renderDataTable({datatable(percentilesDO()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
       formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksDO, clrsDO))})
@@ -243,7 +244,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   # Total Nitrogen Summary Page
   output$TNtable_Site <- DT::renderDataTable({datatable(percentilesTN()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
       formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTN, clrsTN))})
@@ -273,7 +274,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   
   # Total Phosphorus Summary Page
   output$TPtable_Site <- DT::renderDataTable({datatable(percentilesTP()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -304,9 +305,9 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
   
- 
+  
+  
   # Total Habitat Summary Page
   output$TotalHabitattable_Site <- DT::renderDataTable({datatable(percentilesTotalHabitat()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
       formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTotHab, clrsTotHab))})
@@ -336,7 +337,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   
   # LRBS Summary Page
   output$LRBStable_Site <- DT::renderDataTable({datatable(percentilesLRBS()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
@@ -367,7 +368,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   
   # Metals CCU Summary Page
   output$MetalsCCUtable_Site <- DT::renderDataTable({datatable(percentilesMetalsCCU()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
@@ -398,7 +399,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   
   # Specific Conductivity Summary Page
   output$SpCondtable_Site <- DT::renderDataTable({datatable(percentilesSpCond()[1,],colnames = c('StationID','Average (unitless)','Median (unitless)'),rownames = F)%>%
@@ -429,8 +430,8 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
-   
+  
+  
   # TDS Summary Page
   output$TDStable_Site <- DT::renderDataTable({datatable(percentilesTDS()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
       formatStyle(c("Average","Median"), backgroundColor = styleInterval(brksTDS, clrsTDS))})
@@ -460,7 +461,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   
   # Dissolved Sulfate Summary Page
   output$DSulfatetable_Site <- DT::renderDataTable({datatable(percentilesDSulfate()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -491,7 +492,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   
   # Dissolved Chloride Summary Page
   output$DChloridetable_Site <- DT::renderDataTable({datatable(percentilesDChloride()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -522,7 +523,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
-
+  
   
   # Dissolved Potassium Summary Page
   output$DPotassiumtable_Site <- DT::renderDataTable({datatable(percentilesDPotassium()[1,],colnames = c('StationID','Average (mg/L)','Median (mg/L)'),rownames = F)%>%
@@ -553,7 +554,7 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
   })
- 
+  
   
   
   
@@ -646,10 +647,10 @@ shinyServer(function(input, output, session) {
     leafletProxy('VAmap',data=filteredData()) %>% clearMarkers() %>%
       addCircleMarkers(color=~pal(ParameterFactorLevel),fillOpacity=1,stroke=FALSE
                        ,popup=paste(sep = "<br/>",paste(strong("StationID: "),filteredData()$sampleID,sep="")
-                                           ,paste(strong("VSCI Score: "),prettyNum(filteredData()$VSCIAll,digits=3),sep="")
-                                           ,paste(strong(filteredData()$Parameter[1]),": ",
-                                                  prettyNum(filteredData()$ParameterMeasure,digits=4)," ",
-                                                  filteredData()$units,sep="")))})
+                                    ,paste(strong("VSCI Score: "),prettyNum(filteredData()$VSCIAll,digits=3),sep="")
+                                    ,paste(strong(filteredData()$Parameter[1]),": ",
+                                           prettyNum(filteredData()$ParameterMeasure,digits=4)," ",
+                                           filteredData()$units,sep="")))})
   
   # Plot Ecoregion Shapefile
   observe({if(input$eco==TRUE){
@@ -675,13 +676,13 @@ shinyServer(function(input, output, session) {
     df <- subset(cdfdata,Indicator==dataSelectcdf() & Subpopulation=="Virginia")})
   
   output$Statewidecdf <- renderPlot({if(input$showcdf==T){
-      p <- ggplot(filteredDatacdf(), aes(Value,Estimate.P))+
-        labs(list(title=paste("Statewide",input$parameterToPlot,"\nPercentile Graph")
-                  ,x=paste(input$parameterToPlot,filteredDatacdf()$units,sep=" ")
-                  ,y='Statewide Percentile'))
-      p+geom_point()+geom_line(aes(y=LCB95Pct.P),colour='gray')+
-        geom_line(aes(y=UCB95Pct.P),colour='gray')
-      }})
+    p <- ggplot(filteredDatacdf(), aes(Value,Estimate.P))+
+      labs(list(title=paste("Statewide",input$parameterToPlot,"\nPercentile Graph")
+                ,x=paste(input$parameterToPlot,filteredDatacdf()$units,sep=" ")
+                ,y='Statewide Percentile'))
+    p+geom_point()+geom_line(aes(y=LCB95Pct.P),colour='gray')+
+      geom_line(aes(y=UCB95Pct.P),colour='gray')
+  }})
   
   
   
@@ -691,7 +692,7 @@ shinyServer(function(input, output, session) {
   # Dissolved Metals Section
   # Download data template
   output$downloadTemplate_metals <- downloadHandler(filename=function(){'template_metals.csv'},
-                                             content=function(file){write.csv(template_metals,file,row.names=FALSE)})
+                                                    content=function(file){write.csv(template_metals,file,row.names=FALSE)})
   
   
   
@@ -701,7 +702,7 @@ shinyServer(function(input, output, session) {
     return(NULL)
   read.csv(inFile2$datapath)})
   output$inputTable_metals <- DT::renderDataTable({inputFile_metals()})
- 
+  
   # Calculate Metals CCU on input table
   metalsCCU_results <- reactive({inFile2 <- input$siteData_metals
   if(is.null(inputFile_metals()))
@@ -710,7 +711,7 @@ shinyServer(function(input, output, session) {
     mutate(StationID=inputFile_metals()$StationID)%>%
     select(StationID,MetalsCCU)
   return(calc)})  
-   
+  
   # Metal CCU table 
   output$summary_MetalsCCU <- renderDataTable({
     if(is.null(metalsCCU_results()))
@@ -721,14 +722,14 @@ shinyServer(function(input, output, session) {
                            buttons=list('copy',
                                         list(extend='csv',filename=paste('MetalsCCUAnalysis_',Sys.Date(),sep='')),
                                         list(extend='excel',filename=paste('MetalsCCUAnalysis_',Sys.Date(),sep=''))))
-              )})
-
+    )})
+  
   output$metalsSitesUI <- renderUI({inFile2 <- input$siteData_metals
   if(is.null(inputFile_metals()))
     return(NULL)
-    selectInput("metalsSites_", "Select Site to Review", inputFile_metals()[,1] )
+  selectInput("metalsSites_", "Select Site to Review", inputFile_metals()[,1] )
   })
- 
+  
   # Dissolved Metals Lookup Functions
   percentilesDissolvedMetals <- reactive({
     if(is.null(metalsCCU_results()))
@@ -766,8 +767,8 @@ shinyServer(function(input, output, session) {
                            buttons=list('copy',
                                         list(extend='csv',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep='')),
                                         list(extend='excel',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep=''))))
-              )})
- 
+    )})
+  
   # Choose Dissolved Metal to display
   output$dMetal <- renderUI({
     selectInput("dMetal_","Select Dissolved Metal to Plot",names(inputFile_metals()[5:23]))
@@ -786,12 +787,16 @@ shinyServer(function(input, output, session) {
       filter(metal==input$dMetal_)
     pct <- subFunction2(cdfsubset,pct1[,3])
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x=as.character(pct1[1,1]),y="Percentile") +
-        ggtitle(paste("Virginia ",input$dMetal_," Percentile Graph")) + 
-        theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-        theme(axis.title = element_text(face='bold',size=12))
+      ggtitle(paste("Virginia ",input$dMetal_," Percentile Graph")) + 
+      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
+      theme(axis.title = element_text(face='bold',size=12))
     p1+ geom_point(data=pct,color='orange',size=4)
     
   },height = 250,width=325)
+  
+  
+  
+  
   
   ####--------------------------------------- RMARKDOWN SECTION--------------------------------------------------
   # Try outputting html report
@@ -802,12 +807,22 @@ shinyServer(function(input, output, session) {
       file.copy("reportHTML.Rmd",tempReport,overwrite = T)
       params <- list(table_userinput=inputFile(),table_compositestats=stats(),
                      table_Togethersummary=percentilesTogether(),
-                     plot_pHVA=p_pH_VA(),plot_pHB=p_pH_B(),plot_pHE=p_pH_E(),plot_pHO=p_pH_O())
+                     plot_pHVA=p_pH_VA(),plot_pHB=p_pH_B(),plot_pHE=p_pH_E(),plot_pHO=p_pH_O(),
+                     plot_DOVA=p_DO_VA(),plot_DOB=p_DO_B(),plot_DOE=p_DO_E(),plot_DOO=p_DO_O(),
+                     plot_TNVA=p_TN_VA(),plot_TNB=p_TN_B(),plot_TNE=p_TN_E(),plot_TNO=p_TN_O(),
+                     plot_TPVA=p_TP_VA(),plot_TPB=p_TP_B(),plot_TPE=p_TP_E(),plot_TPO=p_TP_O(),
+                     plot_TotalHabitatVA=p_TotalHabitat_VA(),plot_TotalHabitatB=p_TotalHabitat_B(),plot_TotalHabitatE=p_TotalHabitat_E(),plot_TotalHabitatO=p_TotalHabitat_O(),
+                     plot_LRBSVA=p_LRBS_VA(),plot_LRBSB=p_LRBS_B(),plot_LRBSE=p_LRBS_E(),plot_LRBSO=p_LRBS_O(),
+                     plot_MetalsCCUVA=p_MetalsCCU_VA(),plot_MetalsCCUB=p_MetalsCCU_B(),plot_MetalsCCUE=p_MetalsCCU_E(),plot_MetalsCCUO=p_MetalsCCU_O(),
+                     plot_SpCondVA=p_SpCond_VA(),plot_SpCondB=p_SpCond_B(),plot_SpCondE=p_SpCond_E(),plot_SpCondO=p_SpCond_O(),
+                     plot_TDSVA=p_TDS_VA(),plot_TDSB=p_TDS_B(),plot_TDSE=p_TDS_E(),plot_TDSO=p_TDS_O(),
+                     plot_DSulfateVA=p_DSulfate_VA(),plot_DSulfateB=p_DSulfate_B(),plot_DSulfateE=p_DSulfate_E(),plot_DSulfateO=p_DSulfate_O(),
+                     plot_DChlorideVA=p_DChloride_VA(),plot_DChlorideB=p_DChloride_B(),plot_DChlorideE=p_DChloride_E(),plot_DChlorideO=p_DChloride_O(),
+                     plot_DPotassiumVA=p_DPotassium_VA(),plot_DPotassiumB=p_DPotassium_B(),plot_DPotassiumE=p_DPotassium_E(),plot_DPotassiumO=p_DPotassium_O(),
+                     plot_DSodiumVA=p_DSodium_VA(),plot_DSodiumB=p_DSodium_B(),plot_DSodiumE=p_DSodium_E(),plot_DSodiumO=p_DSodium_O())
       
       rmarkdown::render(tempReport,output_file = file,
-                        params=params,envir=new.env(parent = globalenv()))
-    }
-  )
+                        params=params,envir=new.env(parent = globalenv()))})
   
   
   
@@ -850,10 +865,59 @@ shinyServer(function(input, output, session) {
       geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
     return(p1)
   }
+  # All plots to be sent to RMD report
   p_pH_VA <- reactive({cdfRMDplot('pH','Virginia')})
   p_pH_B <- reactive({cdfRMDplot('pH',input$Basin)})
   p_pH_E <- reactive({cdfRMDplot('pH',input$Ecoregion)})
   p_pH_O <- reactive({cdfRMDplot('pH',input$StreamOrder)})
+  p_DO_VA <- reactive({cdfRMDplot('DO','Virginia')})
+  p_DO_B <- reactive({cdfRMDplot('DO',input$Basin)})
+  p_DO_E <- reactive({cdfRMDplot('DO',input$Ecoregion)})
+  p_DO_O <- reactive({cdfRMDplot('DO',input$StreamOrder)})
+  p_TN_VA <- reactive({cdfRMDplot('TN','Virginia')})
+  p_TN_B <- reactive({cdfRMDplot('TN',input$Basin)})
+  p_TN_E <- reactive({cdfRMDplot('TN',input$Ecoregion)})
+  p_TN_O <- reactive({cdfRMDplot('TN',input$StreamOrder)})
+  p_TP_VA <- reactive({cdfRMDplot('TP','Virginia')})
+  p_TP_B <- reactive({cdfRMDplot('TP',input$Basin)})
+  p_TP_E <- reactive({cdfRMDplot('TP',input$Ecoregion)})
+  p_TP_O <- reactive({cdfRMDplot('TP',input$StreamOrder)})
+  p_TotalHabitat_VA <- reactive({cdfRMDplot('TotalHabitat','Virginia')})
+  p_TotalHabitat_B <- reactive({cdfRMDplot('TotalHabitat',input$Basin)})
+  p_TotalHabitat_E <- reactive({cdfRMDplot('TotalHabitat',input$Ecoregion)})
+  p_TotalHabitat_O <- reactive({cdfRMDplot('TotalHabitat',input$StreamOrder)})
+  p_LRBS_VA <- reactive({cdfRMDplot('LRBS','Virginia')})
+  p_LRBS_B <- reactive({cdfRMDplot('LRBS',input$Basin)})
+  p_LRBS_E <- reactive({cdfRMDplot('LRBS',input$Ecoregion)})
+  p_LRBS_O <- reactive({cdfRMDplot('LRBS',input$StreamOrder)})
+  p_MetalsCCU_VA <- reactive({cdfRMDplot('MetalsCCU','Virginia')})
+  p_MetalsCCU_B <- reactive({cdfRMDplot('MetalsCCU',input$Basin)})
+  p_MetalsCCU_E <- reactive({cdfRMDplot('MetalsCCU',input$Ecoregion)})
+  p_MetalsCCU_O <- reactive({cdfRMDplot('MetalsCCU',input$StreamOrder)})
+  p_SpCond_VA <- reactive({cdfRMDplot('SpCond','Virginia')})
+  p_SpCond_B <- reactive({cdfRMDplot('SpCond',input$Basin)})
+  p_SpCond_E <- reactive({cdfRMDplot('SpCond',input$Ecoregion)})
+  p_SpCond_O <- reactive({cdfRMDplot('SpCond',input$StreamOrder)})
+  p_TDS_VA <- reactive({cdfRMDplot('TDS','Virginia')})
+  p_TDS_B <- reactive({cdfRMDplot('TDS',input$Basin)})
+  p_TDS_E <- reactive({cdfRMDplot('TDS',input$Ecoregion)})
+  p_TDS_O <- reactive({cdfRMDplot('TDS',input$StreamOrder)})
+  p_DSulfate_VA <- reactive({cdfRMDplot('DSulfate','Virginia')})
+  p_DSulfate_B <- reactive({cdfRMDplot('DSulfate',input$Basin)})
+  p_DSulfate_E <- reactive({cdfRMDplot('DSulfate',input$Ecoregion)})
+  p_DSulfate_O <- reactive({cdfRMDplot('DSulfate',input$StreamOrder)})
+  p_DChloride_VA <- reactive({cdfRMDplot('DChloride','Virginia')})
+  p_DChloride_B <- reactive({cdfRMDplot('DChloride',input$Basin)})
+  p_DChloride_E <- reactive({cdfRMDplot('DChloride',input$Ecoregion)})
+  p_DChloride_O <- reactive({cdfRMDplot('DChloride',input$StreamOrder)})
+  p_DPotassium_VA <- reactive({cdfRMDplot('DPotassium','Virginia')})
+  p_DPotassium_B <- reactive({cdfRMDplot('DPotassium',input$Basin)})
+  p_DPotassium_E <- reactive({cdfRMDplot('DPotassium',input$Ecoregion)})
+  p_DPotassium_O <- reactive({cdfRMDplot('DPotassium',input$StreamOrder)})
+  p_DSodium_VA <- reactive({cdfRMDplot('DSodium','Virginia')})
+  p_DSodium_B <- reactive({cdfRMDplot('DSodium',input$Basin)})
+  p_DSodium_E <- reactive({cdfRMDplot('DSodium',input$Ecoregion)})
+  p_DSodium_O <- reactive({cdfRMDplot('DSodium',input$StreamOrder)})
   
   
 
