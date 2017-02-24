@@ -231,18 +231,7 @@ shinyServer(function(input, output, session) {
   output$p_DO <- renderPlot({
     if(is.null(input$DOdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"DO",input$DOdataset_)
-    avg1 <- as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDO(),Statistic==input$DOdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Oxygen (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DOdataset_," Dissolved Oxygen Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('DO',input$DOdataset_,percentilesDO())
   })
   
   # Total Nitrogen Summary Page
@@ -261,18 +250,7 @@ shinyServer(function(input, output, session) {
   output$p_TN <- renderPlot({
     if(is.null(input$TNdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"TN",input$TNdataset_)
-    avg1 <- as.numeric(subset(percentilesTN(),Statistic==input$TNdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTN(),Statistic==input$TNdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Nitrogen (mg/L)",y="Percentile") +
-      ggtitle(paste(input$TNdataset_," Total Nitrogen Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('TN',input$TNdataset_,percentilesTN())
   })
   
   
@@ -292,18 +270,7 @@ shinyServer(function(input, output, session) {
   output$p_TP <- renderPlot({
     if(is.null(input$TPdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"TP",input$TPdataset_)
-    avg1 <- as.numeric(subset(percentilesTP(),Statistic==input$TPdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTP(),Statistic==input$TPdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Phosphorus (mg/L)",y="Percentile") +
-      ggtitle(paste(input$TPdataset_," Total Phosphorus Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('TP',input$TPdataset_,percentilesTP())
   })
   
   
@@ -324,18 +291,7 @@ shinyServer(function(input, output, session) {
   output$p_TotalHabitat <- renderPlot({
     if(is.null(input$TotalHabitatdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"TotalHabitat",input$TotalHabitatdataset_)
-    avg1 <- as.numeric(subset(percentilesTotalHabitat(),Statistic==input$TotalHabitatdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTotalHabitat(),Statistic==input$TotalHabitatdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Habitat (unitless)",y="Percentile") +
-      ggtitle(paste(input$TotalHabitatdataset_," Total Habitat Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('TotalHabitat',input$TotalHabitatdataset_,percentilesTotalHabitat())
   })
   
   
@@ -355,18 +311,7 @@ shinyServer(function(input, output, session) {
   output$p_LRBS <- renderPlot({
     if(is.null(input$LRBSdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"LRBS",input$LRBSdataset_)
-    avg1 <- as.numeric(subset(percentilesLRBS(),Statistic==input$LRBSdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesLRBS(),Statistic==input$LRBSdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="LRBS (unitless)",y="Percentile") +
-      ggtitle(paste(input$LRBSdataset_," LRBS Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('LRBS',input$LRBSdataset_,percentilesLRBS())
   })
   
   
@@ -386,18 +331,7 @@ shinyServer(function(input, output, session) {
   output$p_MetalsCCU <- renderPlot({
     if(is.null(input$MetalsCCUdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"MetalsCCU",input$MetalsCCUdataset_)
-    avg1 <- as.numeric(subset(percentilesMetalsCCU(),Statistic==input$MetalsCCUdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesMetalsCCU(),Statistic==input$MetalsCCUdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Metals CCU (unitless)",y="Percentile") +
-      ggtitle(paste(input$MetalsCCUdataset_," Metals CCU Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('MetalsCCU',input$MetalsCCUdataset_,percentilesMetalsCCU())
   })
   
   
@@ -417,18 +351,7 @@ shinyServer(function(input, output, session) {
   output$p_SpCond <- renderPlot({
     if(is.null(input$SpConddataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"SpCond",input$SpConddataset_)
-    avg1 <- as.numeric(subset(percentilesSpCond(),Statistic==input$SpConddataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesSpCond(),Statistic==input$SpConddataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Specific Conductivity (uS/cm)",y="Percentile") +
-      ggtitle(paste(input$SpConddataset_," Specific Conductivity Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('SpCond',input$SpConddataset_,percentilesSpCond())
   })
   
   
@@ -448,18 +371,7 @@ shinyServer(function(input, output, session) {
   output$p_TDS <- renderPlot({
     if(is.null(input$TDSdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"TDS",input$TDSdataset_)
-    avg1 <- as.numeric(subset(percentilesTDS(),Statistic==input$TDSdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesTDS(),Statistic==input$TDSdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Total Dissolved Solids (mg/L)",y="Percentile") +
-      ggtitle(paste(input$TDSdataset_," Total Dissolved Solids Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('TDS',input$TDSdataset_,percentilesTDS())
   })
   
   
@@ -479,18 +391,7 @@ shinyServer(function(input, output, session) {
   output$p_DSulfate <- renderPlot({
     if(is.null(input$DSulfatedataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"DSulfate",input$DSulfatedataset_)
-    avg1 <- as.numeric(subset(percentilesDSulfate(),Statistic==input$DSulfatedataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDSulfate(),Statistic==input$DSulfatedataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sulfate (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DSulfatedataset_," Dissolved Sulfate Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('DSulfate',input$DSulfatedataset_,percentilesDSulfate())
   })
   
   
@@ -510,18 +411,7 @@ shinyServer(function(input, output, session) {
   output$p_DChloride <- renderPlot({
     if(is.null(input$DChloridedataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"DChloride",input$DChloridedataset_)
-    avg1 <- as.numeric(subset(percentilesDChloride(),Statistic==input$DChloridedataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDChloride(),Statistic==input$DChloridedataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Chloride (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DChloridedataset_," Dissolved Chloride Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('DChloride',input$DChloridedataset_,percentilesDChloride())
   })
   
   
@@ -541,18 +431,7 @@ shinyServer(function(input, output, session) {
   output$p_DPotassium <- renderPlot({
     if(is.null(input$DPotassiumdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"DPotassium",input$DPotassiumdataset_)
-    avg1 <- as.numeric(subset(percentilesDPotassium(),Statistic==input$DPotassiumdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDPotassium(),Statistic==input$DPotassiumdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Potassium (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DPotassiumdataset_," Dissolved Potassium Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
+    cdfplot('DPotassium',input$DPotassiumdataset_,percentilesDPotassium())
   })
   
   
@@ -574,19 +453,8 @@ shinyServer(function(input, output, session) {
   output$p_DSodium <- renderPlot({
     if(is.null(input$DSodiumdataset_))
       return(NULL)
-    cdfsubset <- subFunction(cdfdata,"DSodium",input$DSodiumdataset_)
-    avg1 <- as.numeric(subset(percentilesDSodium(),Statistic==input$DSodiumdataset_)[2])
-    avg <- subFunction2(cdfsubset,avg1)
-    med1 <- as.numeric(subset(percentilesDSodium(),Statistic==input$DSodiumdataset_)[3])
-    med <- subFunction2(cdfsubset,med1)
-    m <- max(cdfsubset$NResp)
-    p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x="Dissolved Sodium (mg/L)",y="Percentile") +
-      ggtitle(paste(input$DSodiumdataset_," Dissolved Sodium Percentile Graph (n= ",m," )",sep="")) + 
-      theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=avg,color='orange',size=4) + geom_text(data=avg,label='Average',hjust=1.2) +
-      geom_point(data=med,color='gray',size=4)+ geom_text(data=med,label='Median',hjust=1.2) 
-  }) # have to make separately or cannot send to Rmarkdown report
+    cdfplot('DSodium',input$DSodiumdataset_,percentilesDSodium())
+  })
   
   
   ## Map
@@ -845,12 +713,9 @@ shinyServer(function(input, output, session) {
   #)
   
   
-  
-  
-  
   # CDF plot function for RMD output
-  cdfRMDplot <- function(parameter,indicator){
-    cdfsubset <- subFunction(cdfdata,parameter,indicator)
+  cdfRMDplot <- function(parameter,subsetparameter,indicator){
+    cdfsubset <- subFunction(cdfdata,subsetparameter,indicator)
     avg1 <- as.numeric(filter(percentilesTogether(),Parameter==parameter & Statistic==indicator)[,3])
     avg <- subFunction2(cdfsubset,avg1)
     med1 <- as.numeric(filter(percentilesTogether(),Parameter==parameter & Statistic==indicator)[,4]) 
@@ -866,58 +731,58 @@ shinyServer(function(input, output, session) {
     return(p1)
   }
   # All plots to be sent to RMD report
-  p_pH_VA <- reactive({cdfRMDplot('pH','Virginia')})
-  p_pH_B <- reactive({cdfRMDplot('pH',input$Basin)})
-  p_pH_E <- reactive({cdfRMDplot('pH',input$Ecoregion)})
-  p_pH_O <- reactive({cdfRMDplot('pH',input$StreamOrder)})
-  p_DO_VA <- reactive({cdfRMDplot('DO','Virginia')})
-  p_DO_B <- reactive({cdfRMDplot('DO',input$Basin)})
-  p_DO_E <- reactive({cdfRMDplot('DO',input$Ecoregion)})
-  p_DO_O <- reactive({cdfRMDplot('DO',input$StreamOrder)})
-  p_TN_VA <- reactive({cdfRMDplot('TN','Virginia')})
-  p_TN_B <- reactive({cdfRMDplot('TN',input$Basin)})
-  p_TN_E <- reactive({cdfRMDplot('TN',input$Ecoregion)})
-  p_TN_O <- reactive({cdfRMDplot('TN',input$StreamOrder)})
-  p_TP_VA <- reactive({cdfRMDplot('TP','Virginia')})
-  p_TP_B <- reactive({cdfRMDplot('TP',input$Basin)})
-  p_TP_E <- reactive({cdfRMDplot('TP',input$Ecoregion)})
-  p_TP_O <- reactive({cdfRMDplot('TP',input$StreamOrder)})
-  p_TotalHabitat_VA <- reactive({cdfRMDplot('TotalHabitat','Virginia')})
-  p_TotalHabitat_B <- reactive({cdfRMDplot('TotalHabitat',input$Basin)})
-  p_TotalHabitat_E <- reactive({cdfRMDplot('TotalHabitat',input$Ecoregion)})
-  p_TotalHabitat_O <- reactive({cdfRMDplot('TotalHabitat',input$StreamOrder)})
-  p_LRBS_VA <- reactive({cdfRMDplot('LRBS','Virginia')})
-  p_LRBS_B <- reactive({cdfRMDplot('LRBS',input$Basin)})
-  p_LRBS_E <- reactive({cdfRMDplot('LRBS',input$Ecoregion)})
-  p_LRBS_O <- reactive({cdfRMDplot('LRBS',input$StreamOrder)})
-  p_MetalsCCU_VA <- reactive({cdfRMDplot('MetalsCCU','Virginia')})
-  p_MetalsCCU_B <- reactive({cdfRMDplot('MetalsCCU',input$Basin)})
-  p_MetalsCCU_E <- reactive({cdfRMDplot('MetalsCCU',input$Ecoregion)})
-  p_MetalsCCU_O <- reactive({cdfRMDplot('MetalsCCU',input$StreamOrder)})
-  p_SpCond_VA <- reactive({cdfRMDplot('SpCond','Virginia')})
-  p_SpCond_B <- reactive({cdfRMDplot('SpCond',input$Basin)})
-  p_SpCond_E <- reactive({cdfRMDplot('SpCond',input$Ecoregion)})
-  p_SpCond_O <- reactive({cdfRMDplot('SpCond',input$StreamOrder)})
-  p_TDS_VA <- reactive({cdfRMDplot('TDS','Virginia')})
-  p_TDS_B <- reactive({cdfRMDplot('TDS',input$Basin)})
-  p_TDS_E <- reactive({cdfRMDplot('TDS',input$Ecoregion)})
-  p_TDS_O <- reactive({cdfRMDplot('TDS',input$StreamOrder)})
-  p_DSulfate_VA <- reactive({cdfRMDplot('DSulfate','Virginia')})
-  p_DSulfate_B <- reactive({cdfRMDplot('DSulfate',input$Basin)})
-  p_DSulfate_E <- reactive({cdfRMDplot('DSulfate',input$Ecoregion)})
-  p_DSulfate_O <- reactive({cdfRMDplot('DSulfate',input$StreamOrder)})
-  p_DChloride_VA <- reactive({cdfRMDplot('DChloride','Virginia')})
-  p_DChloride_B <- reactive({cdfRMDplot('DChloride',input$Basin)})
-  p_DChloride_E <- reactive({cdfRMDplot('DChloride',input$Ecoregion)})
-  p_DChloride_O <- reactive({cdfRMDplot('DChloride',input$StreamOrder)})
-  p_DPotassium_VA <- reactive({cdfRMDplot('DPotassium','Virginia')})
-  p_DPotassium_B <- reactive({cdfRMDplot('DPotassium',input$Basin)})
-  p_DPotassium_E <- reactive({cdfRMDplot('DPotassium',input$Ecoregion)})
-  p_DPotassium_O <- reactive({cdfRMDplot('DPotassium',input$StreamOrder)})
-  p_DSodium_VA <- reactive({cdfRMDplot('DSodium','Virginia')})
-  p_DSodium_B <- reactive({cdfRMDplot('DSodium',input$Basin)})
-  p_DSodium_E <- reactive({cdfRMDplot('DSodium',input$Ecoregion)})
-  p_DSodium_O <- reactive({cdfRMDplot('DSodium',input$StreamOrder)})
+  p_pH_VA <- reactive({cdfRMDplot('pH','pH','Virginia')})
+  p_pH_B <- reactive({cdfRMDplot('pH','pH',input$Basin)})
+  p_pH_E <- reactive({cdfRMDplot('pH','pH',input$Ecoregion)})
+  p_pH_O <- reactive({cdfRMDplot('pH','pH',input$StreamOrder)})
+  p_DO_VA <- reactive({cdfRMDplot('DO','DO','Virginia')})
+  p_DO_B <- reactive({cdfRMDplot('DO','DO',input$Basin)})
+  p_DO_E <- reactive({cdfRMDplot('DO','DO',input$Ecoregion)})
+  p_DO_O <- reactive({cdfRMDplot('DO','DO',input$StreamOrder)})
+  p_TN_VA <- reactive({cdfRMDplot('TN','TN','Virginia')})
+  p_TN_B <- reactive({cdfRMDplot('TN','TN',input$Basin)})
+  p_TN_E <- reactive({cdfRMDplot('TN','TN',input$Ecoregion)})
+  p_TN_O <- reactive({cdfRMDplot('TN','TN',input$StreamOrder)})
+  p_TP_VA <- reactive({cdfRMDplot('TP','TP','Virginia')})
+  p_TP_B <- reactive({cdfRMDplot('TP','TP',input$Basin)})
+  p_TP_E <- reactive({cdfRMDplot('TP','TP',input$Ecoregion)})
+  p_TP_O <- reactive({cdfRMDplot('TP','TP',input$StreamOrder)})
+  p_TotalHabitat_VA <- reactive({cdfRMDplot('Total Habitat','TotalHabitat','Virginia')})
+  p_TotalHabitat_B <- reactive({cdfRMDplot('Total Habitat','TotalHabitat',input$Basin)})
+  p_TotalHabitat_E <- reactive({cdfRMDplot('Total Habitat','TotalHabitat',input$Ecoregion)})
+  p_TotalHabitat_O <- reactive({cdfRMDplot('Total Habitat','TotalHabitat',input$StreamOrder)})
+  p_LRBS_VA <- reactive({cdfRMDplot('LRBS','LRBS','Virginia')})
+  p_LRBS_B <- reactive({cdfRMDplot('LRBS','LRBS',input$Basin)})
+  p_LRBS_E <- reactive({cdfRMDplot('LRBS','LRBS',input$Ecoregion)})
+  p_LRBS_O <- reactive({cdfRMDplot('LRBS','LRBS',input$StreamOrder)})
+  p_MetalsCCU_VA <- reactive({cdfRMDplot('Metals CCU','MetalsCCU','Virginia')})
+  p_MetalsCCU_B <- reactive({cdfRMDplot('Metals CCU','MetalsCCU',input$Basin)})
+  p_MetalsCCU_E <- reactive({cdfRMDplot('Metals CCU','MetalsCCU',input$Ecoregion)})
+  p_MetalsCCU_O <- reactive({cdfRMDplot('Metals CCU','MetalsCCU',input$StreamOrder)})
+  p_SpCond_VA <- reactive({cdfRMDplot('Specific Conductivity','SpCond','Virginia')})
+  p_SpCond_B <- reactive({cdfRMDplot('Specific Conductivity','SpCond',input$Basin)})
+  p_SpCond_E <- reactive({cdfRMDplot('Specific Conductivity','SpCond',input$Ecoregion)})
+  p_SpCond_O <- reactive({cdfRMDplot('Specific Conductivity','SpCond',input$StreamOrder)})
+  p_TDS_VA <- reactive({cdfRMDplot('Total Dissolved Solids','TDS','Virginia')})
+  p_TDS_B <- reactive({cdfRMDplot('Total Dissolved Solids','TDS',input$Basin)})
+  p_TDS_E <- reactive({cdfRMDplot('Total Dissolved Solids','TDS',input$Ecoregion)})
+  p_TDS_O <- reactive({cdfRMDplot('Total Dissolved Solids','TDS',input$StreamOrder)})
+  p_DSulfate_VA <- reactive({cdfRMDplot('Dissolved Sulfate','DSulfate','Virginia')})
+  p_DSulfate_B <- reactive({cdfRMDplot('Dissolved Sulfate','DSulfate',input$Basin)})
+  p_DSulfate_E <- reactive({cdfRMDplot('Dissolved Sulfate','DSulfate',input$Ecoregion)})
+  p_DSulfate_O <- reactive({cdfRMDplot('Dissolved Sulfate','DSulfate',input$StreamOrder)})
+  p_DChloride_VA <- reactive({cdfRMDplot('Dissolved Chloride','DChloride','Virginia')})
+  p_DChloride_B <- reactive({cdfRMDplot('Dissolved Chloride','DChloride',input$Basin)})
+  p_DChloride_E <- reactive({cdfRMDplot('Dissolved Chloride','DChloride',input$Ecoregion)})
+  p_DChloride_O <- reactive({cdfRMDplot('Dissolved Chloride','DChloride',input$StreamOrder)})
+  p_DPotassium_VA <- reactive({cdfRMDplot('Dissolved Potassium','DPotassium','Virginia')})
+  p_DPotassium_B <- reactive({cdfRMDplot('Dissolved Potassium','DPotassium',input$Basin)})
+  p_DPotassium_E <- reactive({cdfRMDplot('Dissolved Potassium','DPotassium',input$Ecoregion)})
+  p_DPotassium_O <- reactive({cdfRMDplot('Dissolved Potassium','DPotassium',input$StreamOrder)})
+  p_DSodium_VA <- reactive({cdfRMDplot('Dissolved Sodium','DSodium','Virginia')})
+  p_DSodium_B <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$Basin)})
+  p_DSodium_E <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$Ecoregion)})
+  p_DSodium_O <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$StreamOrder)})
   
   
 
