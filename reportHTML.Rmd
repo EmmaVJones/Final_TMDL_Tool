@@ -65,10 +65,9 @@ DT::datatable(params[['table_userinput']],rownames = F)
 
 ### Composite Statistics
 ```{r,echo=F}
-DT::datatable(params[['table_compositestats']]#%>% 
+DT::datatable(params[['table_compositestats']],rownames = F) 
                 #formatStyle("pH", backgroundColor = 
-                 #             styleInterval(c(0,6,9), c("gray","yellow","limegreen","yellow"))))
-,rownames = F)
+                #              styleInterval(c(0,6,9), c("gray","yellow","limegreen","yellow")))
 ```
 
 ### Individual Parameter Statistics
@@ -77,69 +76,69 @@ DT::datatable(params[['table_Togethersummary']],rownames = F,options=list(dom = 
 ```
 
 ### Statewide CDF Plots
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_pHVA']],params[['plot_pHB']],params[['plot_pHE']],params[['plot_pHO']],
                         ncol=2)
 ```
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_pHVA']],params[['plot_pHB']],params[['plot_pHE']],params[['plot_pHO']],
                         ncol=2)
 ```
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_DOVA']],params[['plot_DOB']],params[['plot_DOE']],params[['plot_DOO']],
                         ncol=2)
 ```
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_TNVA']],params[['plot_TNB']],params[['plot_TNE']],params[['plot_TNO']],
                         ncol=2)
 ```
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_TPVA']],params[['plot_TPB']],params[['plot_TPE']],params[['plot_TPO']],
                         ncol=2)
 ```
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_TotalHabitatVA']],params[['plot_TotalHabitatB']],params[['plot_TotalHabitatE']],params[['plot_TotalHabitatO']],ncol=2)
 ```
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_LRBSVA']],params[['plot_LRBSB']],params[['plot_LRBSE']],params[['plot_LRBSO']],ncol=2)
 ```
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_MetalsCCUVA']],params[['plot_MetalsCCUB']],params[['plot_MetalsCCUE']],params[['plot_MetalsCCUO']],ncol=2)
 ```
 
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_SpCondVA']],params[['plot_SpCondB']],params[['plot_SpCondE']],params[['plot_SpCondO']],ncol=2)
 ```
 
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_TDSVA']],params[['plot_TDSB']],params[['plot_TDSE']],params[['plot_TDSO']],ncol=2)
 ```
 
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_DSulfateVA']],params[['plot_DSulfateB']],params[['plot_DSulfateE']],params[['plot_DSulfateO']],ncol=2)
 ```
 
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_DChlorideVA']],params[['plot_DChlorideB']],params[['plot_DChlorideE']],params[['plot_DChlorideO']],ncol=2)
 ```
 
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_DPotassiumVA']],params[['plot_DPotassiumB']],params[['plot_DPotassiumE']],params[['plot_DPotassiumO']],ncol=2)
 ```
 
 
-```{r,echo=F,fig.height=10,fig.width=12}
+```{r,echo=F,fig.height=10,fig.width=15}
 gridExtra::grid.arrange(params[['plot_DSodiumVA']],params[['plot_DSodiumB']],params[['plot_DSodiumE']],params[['plot_DSodiumO']],ncol=2)
 ```

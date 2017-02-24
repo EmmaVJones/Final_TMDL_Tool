@@ -131,6 +131,21 @@ metalsCCUcalc <- function(Hardness,Aluminum,Arsenic,Cadmium,Chromium,Copper,Lead
              NickelChronic,SeleniumChronic,ZincChronic))
 }
 
+# Metals Criterion Table
+metalsCriteria <- function(Hardness){
+  criteriaHardness <- ifelse(Hardness<25,25,ifelse(Hardness>400,400,Hardness))
+  x <- data.frame(Calcium=NA,Magnesium=NA,Arsenic=150,Barium=NA,Beryllium=NA,
+                  Cadmium=format((exp(0.7977*(log(criteriaHardness))-3.909)),digits=3), # Updated from EPA site
+                  Chromium=format(((exp(0.819*(log(criteriaHardness))+0.6848))*0.86),digits=3),
+                  Copper=format(((exp(0.8545*(log(criteriaHardness))-1.702))*0.96),digits=3),
+                  Iron=1000,Lead=format(((exp(1.273*(log(criteriaHardness))-3.259))),digits=3),
+                  Manganese=50,Thallium=0.24,Nickel=format(((exp(0.846*(log(criteriaHardness))-0.884))*0.997),digits=3),
+                  Silver=format(((exp(1.72*(log(criteriaHardness))-6.59))*0.85),digits=3),# Updated from EPA site
+                  Zinc=format(((exp(0.8473*(log(criteriaHardness))+0.884))*0.986),digits=3),
+                  Antimony=5.6,Aluminum=150,Selenium=5,Hardness=NA)
+  return(as.data.frame(t(x)))}
+
+
 # Metals CCU Calculation for dataframes
 metalsCCUcalcDF <- function(df){
   Hardness <- df$Hardness
