@@ -98,12 +98,12 @@ percentileTable <- function(statsTable,parameter,userBasin,userEco,userOrder,sta
 }
 
 percentileTable_metals <- function(measurementTable,parameter,stationName){
-  sub <- filter(measurementTable,StationID==stationName)%>%select_("StationID",parameter)
+  sub <- select_(measurementTable,"StationID",parameter)%>%filter(StationID%in%as.character(stationName))
   parametercap <- toupper(parameter)
-  unit <- filter(cdfdata,Subpopulation=="Virginia",Indicator==parametercap)
-  va <- filter(cdfdata,Subpopulation=="Virginia",Indicator==parametercap)%>%select(Value,Estimate.P)
-  final <- data.frame(Dissolved_Metal=paste(parameter," (",unit$units[1],")",sep=""),Measure=sub[,2],
-                      Statewide_Percentile=formatC(vlookup(sub[,2],va,2,TRUE),digits=3))
+  unit <- filter(cdfdata,Subpopulation=="Virginia",Indicator%in%parametercap)
+  va <- filter(cdfdata,Subpopulation=="Virginia",Indicator%in%parametercap)%>%select(Value,Estimate.P)
+  final <- data.frame(Dissolved_Metal=paste(parameter," (",unit$units[1],")",sep=""),Measure=sub[1,2],
+                      Statewide_Percentile=formatC(vlookup(sub[1,2],va,2,TRUE),digits=3))
   return(final)
 }
 

@@ -573,7 +573,7 @@ shinyServer(function(input, output, session) {
   
   # Calculate Metals CCU on input table
   metalsCCU_results <- reactive({inFile2 <- input$siteData_metals
-  if(is.null(inputFile_metals()))
+  if(is.null(inFile2))
     return(NULL)
   calc <- metalsCCUcalcDF(inputFile_metals())%>%
     mutate(StationID=inputFile_metals()$StationID)%>%
@@ -589,18 +589,16 @@ shinyServer(function(input, output, session) {
                            dom='Bt', #'Bfrtip',
                            buttons=list('copy',
                                         list(extend='csv',filename=paste('MetalsCCUAnalysis_',Sys.Date(),sep='')),
-                                        list(extend='excel',filename=paste('MetalsCCUAnalysis_',Sys.Date(),sep=''))))
-    )})
+                                        list(extend='excel',filename=paste('MetalsCCUAnalysis_',Sys.Date(),sep='')))))})
   
   output$metalsSitesUI <- renderUI({inFile2 <- input$siteData_metals
-  if(is.null(inputFile_metals()))
+  if(is.null(inFile2))
     return(NULL)
-  selectInput("metalsSites_", "Select Site to Review", inputFile_metals()[,1] )
-  })
+  selectInput("metalsSites_", "Select Site to Review", inputFile_metals()[,1] )})
   
   # Dissolved Metals Lookup Functions
   percentilesDissolvedMetals <- reactive({
-    if(is.null(metalsCCU_results()))
+    if(is.null(metalsCCU_results()) & is.null(input$metalsSites_))
       return(NULL)
     Calcium <- percentileTable_metals(inputFile_metals(),'Calcium',input$metalsSites_)
     Magnesium <- percentileTable_metals(inputFile_metals(),'Magnesium',input$metalsSites_)
@@ -623,8 +621,7 @@ shinyServer(function(input, output, session) {
     Hardness <- percentileTable_metals(inputFile_metals(),'Hardness',input$metalsSites_)
     final <- rbind(Calcium,Magnesium,Arsenic,Barium,Beryllium,Cadmium,Chromium,Copper,Iron,
                    Lead,Manganese,Thallium,Nickel,Silver,Zinc,Antimony,Aluminum,Selenium,Hardness)
-    return(final)
-  })
+    return(final)})
   
   percentilesDissolvedMetals2 <- reactive({
     if(is.null(percentilesDissolvedMetals()))
@@ -633,19 +630,22 @@ shinyServer(function(input, output, session) {
     H <- as.numeric(percentilesDissolvedMetals()[19,2])
     criteria <- metalsCriteria(H)
     names(criteria) <- paste('Dissolved Metal Criteria (Hardness=',H,')',sep='')
-    final <- cbind(percentilesDissolvedMetals(),criteria)})
+    final <- cbind(percentilesDissolvedMetals(),criteria)
+    return(final)})
+ 
   
   output$colors_metals <- DT::renderDataTable({
-    if(is.null(percentilesDissolvedMetals()))
+    if(is.null(percentilesDissolvedMetals2()))
       return(NULL)
-    datatable(percentilesDissolvedMetals(),extensions = 'Buttons', escape=F, rownames = F,
+    datatable(percentilesDissolvedMetals2(),extensions = 'Buttons', escape=F, rownames = F,
               options=list(pageLength=20,
                            dom='Bt', #'Bfrtip',
                            buttons=list('copy',
                                         list(extend='csv',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep='')),
                                         list(extend='excel',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep='')))))
-      
-    })
+    
+  })
+  
   
   # Choose Dissolved Metal to display
   output$dMetal <- renderUI({
@@ -671,6 +671,10 @@ shinyServer(function(input, output, session) {
     p1+ geom_point(data=pct,color='orange',size=4)
     
   },height = 250,width=325)
+  
+  
+  
+  
   
   
   
