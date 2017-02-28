@@ -103,7 +103,7 @@ percentileTable_metals <- function(measurementTable,parameter,stationName){
   unit <- filter(cdfdata,Subpopulation=="Virginia",Indicator==parametercap)
   va <- filter(cdfdata,Subpopulation=="Virginia",Indicator==parametercap)%>%select(Value,Estimate.P)
   final <- data.frame(Dissolved_Metal=paste(parameter," (",unit$units[1],")",sep=""),Measure=sub[,2],
-                      Statewide_Percentile=vlookup(sub[,2],va,2,TRUE))
+                      Statewide_Percentile=formatC(vlookup(sub[,2],va,2,TRUE),digits=3))
   return(final)
 }
 
@@ -113,22 +113,6 @@ subFunction <- function(cdftable,parameter,userInput){
 
 subFunction2 <- function(cdftable,userValue){
   return(filter(cdftable,Estimate.P==userValue))
-}
-
-# Metals CCU Calculation
-metalsCCUcalc <- function(Hardness,Aluminum,Arsenic,Cadmium,Chromium,Copper,Lead,Nickel,Selenium,Zinc){
-  criteriaHardness <- ifelse(Hardness<25,25,ifelse(Hardness>400,400,Hardness))
-  AluminumEPAChronic <- Aluminum/150
-  ArsenicChronic <- Arsenic/150
-  CadmiumChronic <- Cadmium/(exp(0.7852*(log(criteriaHardness))-3.49))
-  ChromiumChronic <- Chromium/((exp(0.819*(log(criteriaHardness))+0.6848))*0.86)
-  CopperChronic <- Copper/((exp(0.8545*(log(criteriaHardness))-1.702))*0.96)
-  LeadChronic <- Lead/((exp(1.273*(log(criteriaHardness))-3.259)))
-  NickelChronic <- Nickel/((exp(0.846*(log(criteriaHardness))-0.884))*0.997)
-  SeleniumChronic <- Selenium/5
-  ZincChronic <- Zinc/((exp(0.8473*(log(criteriaHardness))+0.884))*0.986)
-  return(sum(AluminumEPAChronic,ArsenicChronic,CadmiumChronic,ChromiumChronic,CopperChronic,LeadChronic,
-             NickelChronic,SeleniumChronic,ZincChronic))
 }
 
 # Metals Criterion Table
@@ -145,6 +129,22 @@ metalsCriteria <- function(Hardness){
                   Antimony=5.6,Aluminum=150,Selenium=5,Hardness=NA)
   return(as.data.frame(t(x)))}
 
+
+# Metals CCU Calculation
+metalsCCUcalc <- function(Hardness,Aluminum,Arsenic,Cadmium,Chromium,Copper,Lead,Nickel,Selenium,Zinc){
+  criteriaHardness <- ifelse(Hardness<25,25,ifelse(Hardness>400,400,Hardness))
+  AluminumEPAChronic <- Aluminum/150
+  ArsenicChronic <- Arsenic/150
+  CadmiumChronic <- Cadmium/(exp(0.7852*(log(criteriaHardness))-3.49))
+  ChromiumChronic <- Chromium/((exp(0.819*(log(criteriaHardness))+0.6848))*0.86)
+  CopperChronic <- Copper/((exp(0.8545*(log(criteriaHardness))-1.702))*0.96)
+  LeadChronic <- Lead/((exp(1.273*(log(criteriaHardness))-3.259)))
+  NickelChronic <- Nickel/((exp(0.846*(log(criteriaHardness))-0.884))*0.997)
+  SeleniumChronic <- Selenium/5
+  ZincChronic <- Zinc/((exp(0.8473*(log(criteriaHardness))+0.884))*0.986)
+  return(sum(AluminumEPAChronic,ArsenicChronic,CadmiumChronic,ChromiumChronic,CopperChronic,LeadChronic,
+             NickelChronic,SeleniumChronic,ZincChronic))
+}
 
 # Metals CCU Calculation for dataframes
 metalsCCUcalcDF <- function(df){
