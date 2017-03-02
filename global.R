@@ -108,11 +108,11 @@ percentileTable_metals <- function(measurementTable,parameter,stationName){
 }
 
 subFunction <- function(cdftable,parameter,userInput){
-  return(filter(cdftable,Subpopulation==userInput & Indicator==parameter))
+  return(filter(cdftable,Subpopulation%in%userInput & Indicator%in%parameter))
 }
 
 subFunction2 <- function(cdftable,userValue){
-  return(filter(cdftable,Estimate.P==userValue))
+  return(filter(cdftable,Estimate.P%in%userValue))
 }
 
 # Metals Criterion Table

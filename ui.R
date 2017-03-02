@@ -251,6 +251,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                  helpText("After uploading data from one or more sites on the previous tab ('User Data'), 
                                                           you will be able to scroll through sites to analyze dissolved metals against
                                                           statewide percentiles."),
+                                                 checkboxInput('addstd',strong('Add Criteria to CDF Plot.')),
                                                  br(),br(),br(),br(),br(),br(),br(),br(),
                                                  DT::dataTableOutput('colors_metals')),
                                                  column(5,br(),br(),

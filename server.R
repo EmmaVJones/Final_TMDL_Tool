@@ -457,7 +457,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-  ## Map
+  # ------------------------- Map -----------------------------------------------------------
   colOptions <- data.frame(stressLevels=as.factor(c("No Probability of Stress to Aquatic Life","Low Probability of Stress to Aquatic Life","Medium Probability of Stress to Aquatic Life","High Probability of Stress to Aquatic Life")))
   pal <- colorFactor(c("blue","limegreen","yellow","red"),levels=colOptions$stressLevels, ordered=T)
   # First interpret user selection to enable filtering)
@@ -555,14 +555,11 @@ shinyServer(function(input, output, session) {
   
   
   
-  
-  
-  # Dissolved Metals Section
+  #--------------------------- Dissolved Metals Section -----------------------------------------------
   # Download data template
   output$downloadTemplate_metals <- downloadHandler(filename=function(){'template_metals.csv'},
-                                                    content=function(file){write.csv(template_metals,file,row.names=FALSE)})
-  
-  
+                                                    content=function(file){write.csv(template_metals,
+                                                                                     file,row.names=FALSE)})
   
   # Upload site data
   inputFile_metals <- reactive({inFile2 <- input$siteData_metals
@@ -663,18 +660,27 @@ shinyServer(function(input, output, session) {
     cdfsubset <- subFunction(cdfdata,parametercap,"Virginia")
     pct1 <- cbind(percentilesDissolvedMetals(),metal=sub(" .*","",percentilesDissolvedMetals()$Dissolved_Metal))%>%
       filter(metal==input$dMetal_)
-    pct <- subFunction2(cdfsubset,pct1[,3])
+    pct <- filter(cdfsubset,Value==pct1[,2])
+    m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x=as.character(pct1[1,1]),y="Percentile") +
-      ggtitle(paste("Virginia ",input$dMetal_," Percentile Graph")) + 
+      ggtitle(paste("Virginia",input$dMetal_,"\nPercentile Graph( n=",m,")",sep=" ")) + 
       theme(plot.title = element_text(hjust=0.5,face='bold',size=15)) +
-      theme(axis.title = element_text(face='bold',size=12))
-    p1+ geom_point(data=pct,color='orange',size=4)
+      theme(axis.title = element_text(face='bold',size=12))+
+      geom_point(data=pct,color='orange',size=4)
     
-  },height = 250,width=325)
+    std <- cbind(percentilesDissolvedMetals2()[,c(1,4)],metal=sub(" .*","",percentilesDissolvedMetals()$Dissolved_Metal))%>%
+      filter(metal==input$dMetal_)
+    
+    
+    if(input$addstd==F){return(p1)}else{
+      if(is.na(std[1,2])){
+        xloc <- 0.75*max(cdfsubset$Value)
+        p1+annotate('text',x=xloc,y=50,label='No Criteria',color='red', fontface =2)}else{
+      p1+geom_vline(xintercept=as.numeric(as.character(std[1,2])),color='red',linetype='dashed')}
+    }},height = 250,width=325)
   
   
-  
-  
+ 
   
   
   
@@ -705,26 +711,6 @@ shinyServer(function(input, output, session) {
       
       rmarkdown::render(tempReport,output_file = file,
                         params=params,envir=new.env(parent = globalenv()))})
-  
-  
-  
-  
-  
-  # Try outputting Rmarkdown report
-  #output$report <- downloadHandler(
-  #  "results.pdf",
-  #  content= function(file){
-  #    rmarkdown::render(
-  #      input="report.Rmd",
-  #      output_format=#pdf_document(latex_engine='xelatex'),
-  #      output_file="built_report.pdf",
-  #      params=list(table=stats()))
-  #    readBin(con="built_report.pdf",
-  #            what="raw",
-  #            n=file.info("built_report.pdf")[,"size"])%>%
-  #      writeBin(con=file)
-  #  }
-  #)
   
   
   # CDF plot function for RMD output
@@ -797,22 +783,5 @@ shinyServer(function(input, output, session) {
   p_DSodium_B <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$Basin)})
   p_DSodium_E <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$Ecoregion)})
   p_DSodium_O <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$StreamOrder)})
-  
-  
 
 })
-# In case need to test cdf output
-
-
-#output$test <- renderTable({
-#  if(is.null(inputFile_metals))
-#    return(NULL)
-#  parametercap <- toupper(input$dMetal_)
-#  cdfsubset <- subFunction(cdfdata,parametercap,"Virginia")
-#  pct1 <- mutate(percentilesDissolvedMetals(),metal=sub(" .*","",final$Dissolved_Metal))%>%
-#    filter(metal==input$dMetal_)
-#  pct <- subFunction2(cdfsubset,pct1[,3])
-#  return(pct[,3:8])
-#})
-
-
