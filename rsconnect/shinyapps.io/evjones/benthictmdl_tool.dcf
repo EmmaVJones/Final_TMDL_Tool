@@ -1,0 +1,11 @@
+name: benthictmdl_tool
+title: BenthicTMDL_Tool
+account: evjones
+server: shinyapps.io
+appId: 150114
+bundleId: 736723
+url: https://evjones.shinyapps.io/benthictmdl_tool/
+when: 1488887453.44607
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: buttonsCSVEXCELPDF.R|global1.R|globalWTF.R|preprocessData.R|report.Rmd|server1.R|serverstartedstandardslines.R|serverWTF.R|testing.R|totalmetals.R|uiWTF.R|vlookupCODE.R|confusing/global.R|confusing/server.R|data/AllcdfData.RDS|data/cdfdataFebruary2017update_Dmetalsnotupdated.csv|data/cdfdataFebruary2017update_Dmetalsnotupdated.RDS|data/cdfdataFINAL.csv|data/cdfdataFINAL.RDS|data/cdfdataMarch2017update_final.csv|data/ChipMasterQuery_EVJ.xlsx|data/dat4_2.RDS|data/dat4_final1.RDS|data/dat4.rds|data/DissMetalStatus.CDF.xlsx|data/metalsCDF.RDS|data/probmon_trend_status.xlsx|data/template_metals1.csv|data/template.csv|data/VAstationselect_final.csv|data/VAstationselect_final1.RDS|data/VAstationselect2.RDS|oldfinaldatasets/AllcdfData.RDS|oldfinaldatasets/cdfdataFINAL.csv|oldfinaldatasets/cdfdataFINAL.RDS|oldfinaldatasets/dat4_final.RDS|oldfinaldatasets/VAstationselect_final.RDS|starting point/server.R|starting point/ui.R|TMDLdataviz/.Rhistory|TMDLdataviz/server_ready.R|TMDLdataviz/server.R|TMDLdataviz/ui_ready.R|TMDLdataviz/ui.R|TMDLdataviz/data/AllcdfData.RDS|TMDLdataviz/data/dat4_2.RDS|TMDLdataviz/data/dat4.rds|TMDLdataviz/data/VAstationselect.rds|TMDLdataviz/data/VAstationselect2.RDS|TMDLdataviz/rsconnect/shinyapps.io/evjones/TMDLdataviz.dcf|TMDLdataviz/www/deqlogo.jpg|www/deqapps.jpg

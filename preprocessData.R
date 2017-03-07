@@ -139,7 +139,15 @@ names(metalsStations) <- c("StationID","CollectionDateTime","Longitude","Latitud
                            "Chromium","Copper","Iron","Lead","Manganese",         
                            "Thallium","Nickel","Silver","Zinc","Antimony",        
                            "Aluminum","Selenium","Hardness")
-template_metals <- filter(metalsStations,StationID %in% c( '2-HAM000.37_2014','6BHAR002.41','2-XUD000.15',
+template_metals <- filter(metalsStations,StationID %in% c( '2-HAM000.37_2014','6BHAR002.41',
                                                            '6CGAS000.45','1BMSS001.35'))
+#add data that will blow standard
+violation <- data.frame(StationID='2CXAF000.46',CollectionDateTime='5/14/2009',Longitude=-76.96377777,
+Latitude=37.3544444,Calcium=2.03,Magnesium=0.92,Arsenic=1.85,Barium=77.4,Beryllium=0.17,Cadmium=0.1,
+Chromium=1.55,Copper=1.14,Iron=4320,Lead=0.78,Manganese=4200,Thallium=0.1,Nickel=6.52,Silver=0.1,
+Zinc=7.55,Antimony=0.5,Aluminum=417,Selenium=0.5,Hardness=10)
+template_metals <- rbind(template_metals,violation)
+
+
 write.csv(template_metals,'data/template_metals.csv',row.names=F)
 

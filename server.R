@@ -627,7 +627,7 @@ shinyServer(function(input, output, session) {
     H <- as.numeric(percentilesDissolvedMetals()[19,2])
     criteria <- metalsCriteria(H)
     names(criteria) <- paste('Dissolved Metal Criteria (Hardness=',H,')',sep='')
-    final <- cbind(percentilesDissolvedMetals(),criteria)
+    final <- cbind(percentilesDissolvedMetals()[,-4],criteria)
     return(final)})
   
   
@@ -660,7 +660,9 @@ shinyServer(function(input, output, session) {
     cdfsubset <- subFunction(cdfdata,parametercap,"Virginia")
     pct1 <- cbind(percentilesDissolvedMetals(),metal=sub(" .*","",percentilesDissolvedMetals()$Dissolved_Metal))%>%
       filter(metal==input$dMetal_)
-    pct <- filter(cdfsubset,Value==pct1[,2])
+    pct <- cbind(cdfsubset[1,1:3],Value=pct1$Measure,Estimate.P=as.numeric(as.character(pct1$Statewide_Percentile)),
+                 cdfsubset[1,6:8])
+    #pct <- filter(cdfsubset,Value==pct1[,2])
     m <- max(cdfsubset$NResp)
     p1 <- ggplot(cdfsubset, aes(x=Value,y=Estimate.P)) + geom_point() + labs(x=as.character(pct1[1,1]),y="Percentile") +
       ggtitle(paste("Virginia",input$dMetal_,"\nPercentile Graph( n=",m,")",sep=" ")) + 
