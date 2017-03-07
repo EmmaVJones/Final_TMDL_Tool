@@ -623,23 +623,35 @@ shinyServer(function(input, output, session) {
   percentilesDissolvedMetals2 <- reactive({
     if(is.null(percentilesDissolvedMetals()))
       return(NULL)
-    #H <- as.numeric(filter(inputFile_metals(),StationID==input$metalsSites_)%>%select(Hardness))
     H <- as.numeric(percentilesDissolvedMetals()[19,2])
     criteria <- metalsCriteria(H)
-    names(criteria) <- paste('Dissolved Metal Criteria (Hardness=',H,')',sep='')
-    final <- cbind(percentilesDissolvedMetals()[,-4],criteria)
-    return(final)})
+    criteria$V1 <- as.numeric(as.character(criteria$V1))
+    percentilesDissolvedMetals2 <- cbind(percentilesDissolvedMetals(),criteria)%>%
+      mutate(aboveStd=ifelse(Measure>V1,1,0))
+    names(percentilesDissolvedMetals2)[4] <- paste('Dissolved Metal Criteria (Hardness=',H,')',sep='')
+    
+    
+    ###H <- as.numeric(filter(inputFile_metals(),StationID==input$metalsSites_)%>%select(Hardness))
+    #H <- as.numeric(percentilesDissolvedMetals()[19,2])
+    #criteria <- metalsCriteria(H)
+    #names(criteria) <- paste('Dissolved Metal Criteria (Hardness=',H,')',sep='')
+    #final <- cbind(percentilesDissolvedMetals()[,-4],criteria)%>%
+    return(percentilesDissolvedMetals2)})
   
   
   output$colors_metals <- DT::renderDataTable({
     if(is.null(percentilesDissolvedMetals2()))
       return(NULL)
-    datatable(percentilesDissolvedMetals2(),extensions = 'Buttons', escape=F, rownames = F,
-              options=list(pageLength=20,
-                           dom='Bt', #'Bfrtip',
-                           buttons=list('copy',
-                                        list(extend='csv',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep='')),
-                                        list(extend='excel',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep='')))))
+    DT::datatable(percentilesDissolvedMetals2(),extensions = 'Buttons', escape=F, rownames = F,
+              options=list(
+                columnDefs=list(list(visible=FALSE,targets=4)),
+                pageLength=20,
+                dom='Bt', #'Bfrtip',
+                buttons=list('copy',
+                             list(extend='csv',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep='')),
+                             list(extend='excel',filename=paste(input$metalsSites_,'StatewideDissolvedMetalsAnalysis_',Sys.Date(),sep='')))))%>%
+      formatStyle('aboveStd',target='row',backgroundColor=styleEqual(c(0,1),c('white','red')))
+    
     
   })
   
