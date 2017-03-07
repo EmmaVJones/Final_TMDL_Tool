@@ -465,9 +465,9 @@ shinyServer(function(input, output, session) {
                                  ,'VSCI'='VSCIfactor','Dissolved Oxygen'='DOfactor'
                                  ,'pH'='pHfactor','Specific Conductivity'='SpCondfactor'
                                  ,'Total Phosphorus'='TPfactor','Total Nitrogen'='TNfactor'
-                                 ,'Total Habitat'='TotHabfactor','Total Dissolved Solids'='TDS_Vfactor'
-                                 ,'Metals CCU'='MetalCCUfactor','LRBS'='LRBSfactor','Dissolved Sodium'='NA_Vfactor'
-                                 ,'Dissolved Potassium'='K_Vfactor','Dissolved Chloride'='Cl_Vfactor','Dissolved Sulfate'='Sf_Vfactor')})
+                                 ,'Total Habitat'='TotHabfactor','Total Dissolved Solids'='TDSfactor'
+                                 ,'Metals CCU'='MetalCCUfactor','LRBS'='LRBSfactor','Dissolved Sodium'='Nafactor'
+                                 ,'Dissolved Potassium'='Kfactor','Dissolved Chloride'='Clfactor','Dissolved Sulfate'='Sffactor')})
   dataSelectcdf <- reactive({switch(input$parameterToPlot
                                     ,'VSCI'='VSCIAll','Dissolved Oxygen'='DO','pH'='pH','Specific Conductivity'='SpCond'
                                     ,'Total Phosphorus'='TP','Total Nitrogen'='TN','Total Habitat'='TotalHabitat'
@@ -475,7 +475,7 @@ shinyServer(function(input, output, session) {
                                     ,'Dissolved Sulfate'='DSulfate','Dissolved Chloride'='DChloride'
                                     ,'Dissolved Potassium'='DPotassium','Dissolved Sodium'='DSodium')})
   filteredData <- reactive({
-    df2 <- subset(dat4,ParameterFactor==dataSelect())
+    df2 <- subset(virginiaStations,ParameterFactor==dataSelect())
   })
   
   output$VAmap <- renderLeaflet({

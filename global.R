@@ -9,8 +9,8 @@ library(tidyr)
 library(reshape2)
 
 # Local data locations
-VAstationselect <- readRDS('data/VAstationselect_final.RDS')
-dat4 <- readRDS('data/dat4_final.RDS')
+VAstationselect <- readRDS('data/VAstationselectMarch2017update_final.RDS')
+virginiaStations <- readRDS('data/VirginiaStations.RDS')
 cdfdata <- readRDS('data/cdfdataMarch2017update_final.RDS')
 template <- read.csv('data/templateGIS.csv')
 template_metals <- read.csv('data/template_metals.csv')

@@ -7,7 +7,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                               h4("This app was created to assist in the identification of benthic stressors 
                                                                  to aquatic communities."),
                                                               h5("By uploading field parameters and chemistry data from a given sample site, 
-                                                                 users may compare their dataset to 10 years of Virginia Probabilistic Monitoring
+                                                                 users may compare their dataset to 14 years of Virginia Probabilistic Monitoring
                                                                  data by major river basin, stream order, and ecoregion."),
                                                               br(),
                                                               h5(strong("Authors:")),
@@ -202,7 +202,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                         leafletOutput('VAmap',width = '100%', height='100%'),
                                                         absolutePanel(top=60, right=50, class="panel panel-default",fixed=T,
                                                                       draggable = T, left = 50,bottom="auto",height="auto",width=900,
-                                                                      p("The statewide map demonstrates water quality parameters as measured at 474 stations across Virginia. Users may display 
+                                                                      p("The statewide map demonstrates water quality parameters as measured at 646 stations across Virginia. Users may display 
                                                                         basin and ecoregion layers to give additional context to parameter variation. Risk categories for each parameter are consistent 
                                                                         with breaks and color formatting utilized throughout the app.",span("(draggable)",style="color:red"))),
                                                         absolutePanel(top=140, right=10,class="panel panel-default",fixed=T,style = "overflow-y:scroll; max-height: 400px",
