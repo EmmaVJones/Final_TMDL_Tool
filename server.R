@@ -628,7 +628,7 @@ shinyServer(function(input, output, session) {
     criteria$V1 <- as.numeric(as.character(criteria$V1))
     percentilesDissolvedMetals2 <- cbind(percentilesDissolvedMetals(),criteria)%>%
       mutate(aboveStd=ifelse(Measure>V1,1,0))
-    names(percentilesDissolvedMetals2)[4] <- paste('Dissolved Metal Criteria (Hardness=',H,')',sep='')
+    names(percentilesDissolvedMetals2)[4] <- paste('Dissolved Metal Chronic Criteria (Hardness=',H,')',sep='')
     
     
     ###H <- as.numeric(filter(inputFile_metals(),StationID==input$metalsSites_)%>%select(Hardness))
