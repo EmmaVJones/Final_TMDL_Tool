@@ -473,7 +473,7 @@ shinyServer(function(input, output, session) {
                                     ,'Total Phosphorus'='TP','Total Nitrogen'='TN','Total Habitat'='TotalHabitat'
                                     ,'LRBS'='LRBS','Metals CCU'='MetalsCCU','Total Dissolved Solids'='TDS'
                                     ,'Dissolved Sulfate'='DSulfate','Dissolved Chloride'='DChloride'
-                                    ,'Dissovled Potassium'='DPotassium','Dissolved Sodium'='DSodium')})
+                                    ,'Dissolved Potassium'='DPotassium','Dissolved Sodium'='DSodium')})
   filteredData <- reactive({
     df2 <- subset(dat4,ParameterFactor==dataSelect())
   })
@@ -629,7 +629,7 @@ shinyServer(function(input, output, session) {
     names(criteria) <- paste('Dissolved Metal Criteria (Hardness=',H,')',sep='')
     final <- cbind(percentilesDissolvedMetals(),criteria)
     return(final)})
- 
+  
   
   output$colors_metals <- DT::renderDataTable({
     if(is.null(percentilesDissolvedMetals2()))
@@ -676,11 +676,11 @@ shinyServer(function(input, output, session) {
       if(is.na(std[1,2])){
         xloc <- 0.75*max(cdfsubset$Value)
         p1+annotate('text',x=xloc,y=50,label='No Criteria',color='red', fontface =2)}else{
-      p1+geom_vline(xintercept=as.numeric(as.character(std[1,2])),color='red',linetype='dashed')}
+          p1+geom_vline(xintercept=as.numeric(as.character(std[1,2])),color='red',linetype='dashed')}
     }},height = 250,width=325)
   
   
- 
+  
   
   
   
@@ -783,5 +783,5 @@ shinyServer(function(input, output, session) {
   p_DSodium_B <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$Basin)})
   p_DSodium_E <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$Ecoregion)})
   p_DSodium_O <- reactive({cdfRMDplot('Dissolved Sodium','DSodium',input$StreamOrder)})
-
+  
 })

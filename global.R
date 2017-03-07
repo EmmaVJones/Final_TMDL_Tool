@@ -11,10 +11,10 @@ library(reshape2)
 # Local data locations
 VAstationselect <- readRDS('data/VAstationselect_final.RDS')
 dat4 <- readRDS('data/dat4_final.RDS')
-cdfdata <- readRDS('data/cdfdataFebruary2017update_Dmetalsnotupdated.RDS')
+cdfdata <- readRDS('data/cdfdataMarch2017update_final.RDS')
 template <- read.csv('data/templateGIS.csv')
 template_metals <- read.csv('data/template_metals.csv')
-metalsCDF <- readRDS('data/metalsCDF.RDS')
+metalsCDF <- readRDS('data/metalsCDF_March2017Update.RDS')
 
 # Color breaks and table formatting
 brkspH <- c(0,6,9)

@@ -40,7 +40,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                                 understanding stressors."),
                                                               hr(),
                                                               h4(strong("To begin, simply navigate to the 'Upload Data' tab and follow the on screen 
-                                                                 instructions."))))),
+                                                                        instructions."))))),
                              tabPanel("Data Upload",
                                       column(4,wellPanel(
                                         h4("Instructions:"),
@@ -76,7 +76,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                  DT::dataTableOutput('inputTable'),
                                                  hr(),
                                                  column(6,h3("Summary Statistics"),
-                                                 tableOutput("summaryStats"))),
+                                                        tableOutput("summaryStats"))),
                                         tabPanel("Metals CCU Analysis, Single Site",
                                                  h3("User Input Metals Data"),
                                                  helpText("Please use this form to calculate MetalsCCU data for the User Data tab if you
@@ -105,17 +105,17 @@ shinyUI(fluidPage(theme="slate.css",
                                       column(12,tabsetPanel(
                                         tabPanel("Composite Table",br(),br(),
                                                  h4('Composite Table'),helpText('You can export the table below as a .csv, .xlsx, or .pdf by clicking the corresponding
-                                                          button below. The Copy button copies all table data for you to put into any spreadsheet 
-                                                          program. If you want the color background formatting, you need to manually select the 
-                                                          table with your cursor to copy all associated formatting to a spreadsheet program.'),
+                                                                                button below. The Copy button copies all table data for you to put into any spreadsheet 
+                                                                                program. If you want the color background formatting, you need to manually select the 
+                                                                                table with your cursor to copy all associated formatting to a spreadsheet program.'),
                                                  DT::dataTableOutput('colors'),
                                                  column(3,DT::dataTableOutput('riskTableInfo')),br(),br(),
                                                  column(4,
                                                         wellPanel(h4('Report Output:'),
-                                                                    helpText('Click below to save a .HTML version of all the tables and graphics associated with 
-                                                                             the input station. You can save this to a .pdf after initial HTML conversion 
-                                                                             (File -> Print -> Save as PDF).'),
-                                                   downloadButton('report','Generate Report')))),
+                                                                  helpText('Click below to save a .HTML version of all the tables and graphics associated with 
+                                                                           the input station. You can save this to a .pdf after initial HTML conversion 
+                                                                           (File -> Print -> Save as PDF).'),
+                                                                  downloadButton('report','Generate Report')))),
                                         # pH Summary
                                         tabPanel("pH Summary",br(),br(),h4('pH Summary'),
                                                  DT::dataTableOutput('pHtable_Site'),
@@ -195,7 +195,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                             DT::dataTableOutput('DSodiumtable'),br(),
                                                             column(6,DT::dataTableOutput('riskTableDSodium')),
                                                             column(6,uiOutput("DSodiumdataset"), uiOutput("DSodiumplot_"),plotOutput('DSodiumplot'))))
-                                                   ))),
+                                                 ))),
                              tabPanel("Statewide Map",
                                       bootstrapPage(div(class="outer",
                                                         tags$style(type ="text/css",".outer {position: fixed; top: 41px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0}"),
@@ -212,7 +212,7 @@ shinyUI(fluidPage(theme="slate.css",
                                                                                   ,label = 'Choose a water quality parameter to display'
                                                                                   ,choices=c('','VSCI','pH','Dissolved Oxygen','Total Nitrogen','Total Phosphorus'
                                                                                              ,'Total Habitat','LRBS','Metals CCU','Specific Conductivity','Total Dissolved Solids'
-                                                                                             ,'Dissolved Sulfate','Dissolved Chloride','Dissovled Potassium','Dissolved Sodium')
+                                                                                             ,'Dissolved Sulfate','Dissolved Chloride','Dissolved Potassium','Dissolved Sodium')
                                                                                   , selected=''),
                                                                       checkboxInput('showcdf','Show Statewide CDF Plot'),
                                                                       checkboxInput('eco','Show Ecoregions (Level III)',value=F),
@@ -245,27 +245,26 @@ shinyUI(fluidPage(theme="slate.css",
                                                                  back to this app or use it for additional analyses.'))),
                                         tabPanel("Data Summary",
                                                  fluidPage(
-                                                 fluidRow(column(5,
-                                                 h4("Dissolved Metals Statewide"),
-                                                 uiOutput("metalsSitesUI"),
-                                                 helpText("After uploading data from one or more sites on the previous tab ('User Data'), 
-                                                          you will be able to scroll through sites to analyze dissolved metals against
-                                                          statewide percentiles."),
-                                                 checkboxInput('addstd',strong('Add Criteria to CDF Plot.')),
-                                                 br(),br(),br(),br(),br(),br(),br(),br(),
-                                                 DT::dataTableOutput('colors_metals')),
-                                                 column(5,br(),br(),
-                                                        uiOutput('dMetal'),
-                                                        uiOutput('dMetalplot_'),
-                                                        plotOutput('dissolvedmetalscdf'))
-                                                        
-                                                 ))
+                                                   fluidRow(column(5,
+                                                                   h4("Dissolved Metals Statewide"),
+                                                                   uiOutput("metalsSitesUI"),
+                                                                   helpText("After uploading data from one or more sites on the previous tab ('User Data'), 
+                                                                            you will be able to scroll through sites to analyze dissolved metals against
+                                                                            statewide percentiles."),
+                                                                   checkboxInput('addstd',strong('Add Criteria to CDF Plot.')),
+                                                                   br(),br(),br(),br(),br(),br(),br(),br(),
+                                                                   DT::dataTableOutput('colors_metals')),
+                                                            column(5,br(),br(),
+                                                                   uiOutput('dMetal'),
+                                                                   uiOutput('dMetalplot_'),
+                                                                   plotOutput('dissolvedmetalscdf'))
+                                                            
+                                                   ))
                                                  
                                                  
                                                  
                                                  
                                                  ))))
-                                      
-                  ))
-)
-                                                                 
+                             
+                                      ))
+                             )
