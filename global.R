@@ -7,6 +7,7 @@ library(dplyr)
 library(DT)
 library(tidyr)
 library(reshape2)
+library(taRifx)
 
 # Local data locations
 VAstationselect <- readRDS('data/VAstationselectMarch2017update_final.RDS')

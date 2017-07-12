@@ -1,8 +1,8 @@
 source('global.R')
 
 # Upload GIS data here to avoid uploading it twice (if it were in the global.R file)
-eco2 <- readOGR('data/','vaECOREGIONlevel3__proj84')
-supaB2 <- readOGR('data/','VAsuperbasins_proj84')
+eco2 <- readOGR('data','vaECOREGIONlevel3__proj84')
+supaB2 <- readOGR('data','VAsuperbasins_proj84')
 
 options(DT.options = list(dom = 't'))
 
@@ -22,19 +22,25 @@ shinyServer(function(input, output, session) {
   
   # Calculate statistics on input table
   stats <- reactive({inFile <- input$siteData
-  if(is.null(inFile))
-    return(NULL)
-  datamean <- select(inputFile(),-c(StationID,CollectionDateTime,Longitude,Latitude))%>%
+  req(inFile)
+  
+  # Deal with columns of only NA coming in as logical
+  dat <- inputFile()
+  dat <- japply( dat, which(sapply(dat, class)=="logical"), as.numeric )
+  
+  datamean <- select(dat,-c(StationID,CollectionDateTime,Longitude,Latitude))%>%
     summarise_each(funs(format(mean(., na.rm = TRUE),digits=4)))%>%mutate(Statistic="Average")
-  datamedian <- select(inputFile(),-c(StationID,CollectionDateTime,Longitude,Latitude))%>%
+  datamean[datamean %in% c("NaN","NA")] <- NA
+  datamedian <- select(dat,-c(StationID,CollectionDateTime,Longitude,Latitude))%>%
     summarise_each(funs(format(median(., na.rm = TRUE),digits=4)))%>%mutate(Statistic="Median")
+  datamedian[datamedian %in% c("NaN","NA")] <- NA
   data_all <- rbind(datamean,datamedian)%>%select(Statistic,everything())
   return(data_all)
   })
   
   stats_wGIS <- reactive({
-    if(is.null(stats()))
-      return(data.frame(StationID="test",Longitude=45.55,Latitude=0))
+  #  if(is.null(stats()))
+  #    return(data.frame(StationID="test",Longitude=45.55,Latitude=0))
     data_GIS <- reshape2::melt(stats(),c("Statistic"))%>%
       dcast(variable~Statistic)%>%
       mutate(StationID=unique(inputFile()$StationID),
@@ -479,7 +485,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$VAmap <- renderLeaflet({
-    leaflet(VAstationselect) %>% addProviderTiles('Thunderforest.Outdoors') %>%
+    leaflet(VAstationselect) %>% addProviderTiles('OpenStreetMap.HOT') %>%
       fitBounds(~min(Longitude),~min(Latitude)
                 ,~max(Longitude),~max(Latitude))
   })

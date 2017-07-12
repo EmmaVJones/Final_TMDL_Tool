@@ -1,7 +1,7 @@
 source('global.R')
 
 
-shinyUI(fluidPage(theme="slate.css",
+shinyUI(fluidPage(theme="yeti.css",
                   navbarPage("VDEQ Benthic Stressor Analysis Tool",
                              tabPanel("About",fluidRow(column(10,
                                                               h4("This app was created to assist in the identification of benthic stressors 

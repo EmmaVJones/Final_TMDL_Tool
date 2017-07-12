@@ -71,7 +71,7 @@ badtogood <- c("gray","red","yellow", "limegreen","cornflowerblue")
 DT::datatable(params[['table_compositestats']],rownames = F)%>%
   formatStyle(names(params[[2]])[2], backgroundColor=styleInterval(c(0,6,9),c("gray","yellow",
                                                                               "limegreen","yellow")))%>%
-  formatStyle(names(params[[2]])[3], backgroundColor = styleInterval(c(0,7,8,10),goodtobad)) %>%
+  formatStyle(names(params[[2]])[3], backgroundColor = styleInterval(c(0,7,8,10),badtogood)) %>%
       formatStyle(names(params[[2]])[4],backgroundColor = styleInterval(c(0,0.5,1,2),goodtobad))%>%
       formatStyle(names(params[[2]])[5], backgroundColor = styleInterval(c(0,0.02,0.05,0.1),goodtobad))%>%
       formatStyle(names(params[[2]])[6], backgroundColor = styleInterval(c(0,100,130,150),badtogood))%>%
